@@ -141,6 +141,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
               t.style.zIndex = ''
             })
             el.style.zIndex = '1000'
+            map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
           } else {
             el.style.zIndex = ''
           }

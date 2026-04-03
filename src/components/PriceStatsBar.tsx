@@ -88,7 +88,11 @@ export function PriceStatsBar({ stations, lastUpdated, map }: PriceStatsBarProps
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingLeft: 'env(safe-area-inset-left, 0px)',
+        paddingRight: 'env(safe-area-inset-right, 0px)',
+      }}
     >
       <div className="flex items-center justify-around px-4 py-2">
         <StatItem

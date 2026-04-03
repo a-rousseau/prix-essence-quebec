@@ -314,6 +314,17 @@ html, body, #root {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* ── Safe area insets for standalone PWA ── */
+.leaflet-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.leaflet-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.leaflet-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
 .leaflet-container a.station-card-directions {
   color: #fff;
   text-decoration: none;
