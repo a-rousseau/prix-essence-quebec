@@ -201,6 +201,18 @@ function LocateControl() {
       iconAnchor: [12, 12],
     })
 
+    function showGeoError(message: string) {
+      const container = map.getContainer()
+      const notice = document.createElement('div')
+      notice.style.cssText =
+        'position:absolute;top:1rem;left:1rem;right:1rem;z-index:2000;' +
+        'background:#fef2f2;border:1px solid #fecaca;border-radius:0.5rem;' +
+        'padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);'
+      notice.textContent = message
+      container.appendChild(notice)
+      setTimeout(() => notice.remove(), 4000)
+    }
+
     function locate(flyTo: boolean) {
       if (!navigator.geolocation) return
       navigator.geolocation.getCurrentPosition(
@@ -213,8 +225,19 @@ function LocateControl() {
           }
           if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
         },
-        (err) => { console.warn('Geolocation error:', err) },
-        { enableHighAccuracy: true }
+        (err) => {
+          console.warn('Geolocation error:', err)
+          if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
+            showGeoError('Accès à la localisation refusé. Vérifiez les permissions dans vos réglages.')
+          } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+            showGeoError('Position introuvable. Réessayez dans un moment.')
+          } else if (err.code === GeolocationPositionError.TIMEOUT) {
+            showGeoError('La demande de localisation a expiré.')
+          } else {
+            showGeoError('Erreur de géolocalisation.')
+          }
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
       )
     }
 
