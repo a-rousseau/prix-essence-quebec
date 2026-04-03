@@ -2,20 +2,24 @@ interface BrandInfo {
   cssClass: string
   label: string
   color: string
+  logoPath?: string
 }
 
 const BRAND_MAP: Record<string, BrandInfo> = {
-  ultramar:      { cssClass: 'brand-ultramar',      label: 'U',  color: '#e31837' },
-  shell:         { cssClass: 'brand-shell',          label: 'S',  color: '#DD1D21' },
-  petrocanada:   { cssClass: 'brand-petrocanada',    label: 'PC', color: '#CC0000' },
-  esso:          { cssClass: 'brand-esso',           label: 'E',  color: '#003087' },
-  couchetard:    { cssClass: 'brand-couchetard',     label: 'CT', color: '#F16421' },
-  irving:        { cssClass: 'brand-irving',         label: 'I',  color: '#00539B' },
-  pioneer:       { cssClass: 'brand-pioneer',        label: 'P',  color: '#F7941D' },
-  costco:        { cssClass: 'brand-costco',         label: 'Co', color: '#005DAA' },
-  metro:         { cssClass: 'brand-metro',          label: 'M',  color: '#E4002B' },
-  supersave:     { cssClass: 'brand-supersave',      label: 'SS', color: '#0071CE' },
-  'canadian tire': { cssClass: 'brand-canadiantire', label: 'CT', color: '#C8102E' },
+  ultramar:       { cssClass: 'brand-ultramar',     label: 'U',  color: '#e31837', logoPath: '/brands/ultramar.png' },
+  shell:          { cssClass: 'brand-shell',         label: 'S',  color: '#DD1D21', logoPath: '/brands/shell.svg' },
+  petrocanada:    { cssClass: 'brand-petrocanada',   label: 'PC', color: '#CC0000', logoPath: '/brands/petrocanada.png' },
+  esso:           { cssClass: 'brand-esso',          label: 'E',  color: '#003087', logoPath: '/brands/esso.svg' },
+  couchetard:     { cssClass: 'brand-couchetard',    label: 'CT', color: '#F16421', logoPath: '/brands/couchetard.svg' },
+  'circle k':     { cssClass: 'brand-couchetard',    label: 'CK', color: '#F16421', logoPath: '/brands/circlek.svg' },
+  irving:         { cssClass: 'brand-irving',        label: 'I',  color: '#00539B', logoPath: '/brands/irving.svg' },
+  costco:         { cssClass: 'brand-costco',        label: 'Co', color: '#005DAA', logoPath: '/brands/costco.svg' },
+  metro:          { cssClass: 'brand-metro',         label: 'M',  color: '#E4002B', logoPath: '/brands/metro.svg' },
+  supersave:      { cssClass: 'brand-supersave',     label: 'SS', color: '#0071CE' },
+  'canadian tire':{ cssClass: 'brand-canadiantire',  label: 'CT', color: '#C8102E', logoPath: '/brands/canadiantire.png' },
+  crevier:        { cssClass: 'brand-crevier',       label: 'Cr', color: '#EB0028', logoPath: '/brands/crevier.svg' },
+  harnois:        { cssClass: 'brand-harnois',       label: 'H',  color: '#0057A8', logoPath: '/brands/harnois.png' },
+  pioneer:        { cssClass: 'brand-pioneer',       label: 'P',  color: '#F7941D' },
 }
 
 function normalize(name: string): string {

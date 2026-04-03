@@ -27,55 +27,45 @@ function getPriceColor(price: number | null, lowest: number, highest: number): s
   return PRICE_COLORS.high
 }
 
-function createTooltipContent(s: Station): string {
-  const price = s.prixRegulier !== null ? `${s.prixRegulier}¢` : 'N/D'
-  const name = s.banniere || s.nom
-  return `
-    <div class="tooltip-card">
-      <div class="tooltip-info">
-        <div class="tooltip-name">${name}</div>
-        <div class="tooltip-price">${price}</div>
-      </div>
-    </div>`
-}
-
-function formatPrice(p: number | null): string {
+function fmt(p: number | null): string {
   return p !== null ? `${p}¢` : '—'
 }
 
-function createPopupContent(s: Station): string {
+function createStationCard(s: Station): string {
   const brand = getBrand(s.banniere)
-  const name = s.banniere || s.nom
+  const displayName = s.banniere || s.nom
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
+  const badgeHtml = brand.logoPath
+    ? `<img src="${brand.logoPath}" class="brand-logo" alt="${displayName}" width="28" height="28">`
+    : `<span class="brand-badge ${brand.cssClass}" style="background:${brand.color}">${brand.label}</span>`
   return `
-    <div class="popup-full">
-      <div class="popup-header">
-        <span class="brand-badge ${brand.cssClass}" style="background:${brand.color}">${brand.label}</span>
-        <div class="popup-title">
-          <div class="popup-name">${name}</div>
-          ${s.nom !== s.banniere ? `<div class="popup-subname">${s.nom}</div>` : ''}
+    <div class="station-card">
+
+      <div class="station-card-compact">
+        <div class="station-card-name">${badgeHtml}</div>
+        <div class="station-card-price">${fmt(s.prixRegulier)}</div>
+      </div>
+      <div class="station-card-details">
+        <div class="station-card-details-inner">
+          <div class="station-card-header">
+            ${badgeHtml}
+            <div>
+              <div class="station-card-fullname">${s.nom}</div>
+              <div class="station-card-address">${s.adresse}</div>
+              <div class="station-card-region">${s.codePostal} · ${s.region}</div>
+            </div>
+          </div>
+          <div class="station-card-prices">
+            <div class="station-card-price-row"><span>Régulier</span><strong>${fmt(s.prixRegulier)}</strong></div>
+            <div class="station-card-price-row"><span>Super</span><strong>${fmt(s.prixSuper)}</strong></div>
+            <div class="station-card-price-row"><span>Diesel</span><strong>${fmt(s.prixDiesel)}</strong></div>
+          </div>
+          <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener">
+            Obtenir l'itinéraire
+          </a>
+          <div class="station-card-sep"></div>
         </div>
       </div>
-      <div class="popup-address">${s.adresse}</div>
-      <div class="popup-region">${s.codePostal} · ${s.region}</div>
-      <div class="popup-prices">
-        <div class="popup-price-row">
-          <span class="popup-price-label">Régulier</span>
-          <span class="popup-price-value">${formatPrice(s.prixRegulier)}</span>
-        </div>
-        <div class="popup-price-row">
-          <span class="popup-price-label">Super</span>
-          <span class="popup-price-value">${formatPrice(s.prixSuper)}</span>
-        </div>
-        <div class="popup-price-row">
-          <span class="popup-price-label">Diesel</span>
-          <span class="popup-price-value">${formatPrice(s.prixDiesel)}</span>
-        </div>
-      </div>
-      <a class="popup-directions-btn" href="${mapsUrl}" target="_blank" rel="noopener"
-         data-address="${s.adresse.replace(/"/g, '&quot;')}">
-        Obtenir l'itinéraire
-      </a>
     </div>`
 }
 
@@ -110,27 +100,68 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
         fillOpacity: 0.9,
       })
 
-      marker.bindTooltip(createTooltipContent(s), {
+      marker.bindTooltip(createStationCard(s), {
         permanent: true,
         direction: 'top',
         offset: [0, -8],
         className: 'station-tooltip',
+        interactive: true,
       })
 
-      marker.bindPopup(createPopupContent(s), {
-        className: 'station-popup',
-        maxWidth: 260,
-        minWidth: 220,
-      })
+      interface LeafletTooltipInternal extends L.Tooltip {
+        _updatePosition(): void
+      }
 
-      // Copy address to clipboard when directions link is clicked
-      marker.on('popupopen', (e) => {
-        const btn = e.popup.getElement()?.querySelector('.popup-directions-btn')
-        if (btn) {
-          btn.addEventListener('click', () => {
-            navigator.clipboard?.writeText(s.adresse).catch(() => {})
-          })
+      marker.on('tooltipopen', (e) => {
+        const el = e.tooltip.getElement()
+        if (!el) return
+
+        const compact = el.querySelector('.station-card-compact')
+        const card = el.querySelector('.station-card')
+        const directions = el.querySelector('.station-card-directions')
+
+        const runPositionLoop = () => {
+          const tooltip = marker.getTooltip()
+          if (!tooltip) return
+          const start = performance.now()
+          const tick = (now: number) => {
+            // Only reposition — do NOT call tooltip.update() which resets innerHTML
+            ;(tooltip as LeafletTooltipInternal)._updatePosition()
+            if (now - start < 280) requestAnimationFrame(tick)
+          }
+          requestAnimationFrame(tick)
         }
+
+        compact?.addEventListener('click', (evt) => {
+          evt.stopPropagation()
+          const isExpanding = !card?.classList.contains('expanded')
+          card?.classList.toggle('expanded')
+          // Bring this tooltip to the front by raising its z-index above all others
+          if (isExpanding) {
+            document.querySelectorAll<HTMLElement>('.station-tooltip').forEach(t => {
+              t.style.zIndex = ''
+            })
+            el.style.zIndex = '1000'
+          } else {
+            el.style.zIndex = ''
+          }
+          runPositionLoop()
+
+          if (isExpanding && card) {
+            const closeOnOutside = (e: MouseEvent) => {
+              if (!card.contains(e.target as Node)) {
+                card.classList.remove('expanded')
+                runPositionLoop()
+                document.removeEventListener('click', closeOnOutside, true)
+              }
+            }
+            setTimeout(() => document.addEventListener('click', closeOnOutside, true), 0)
+          }
+        })
+
+        directions?.addEventListener('click', () => {
+          navigator.clipboard?.writeText(s.adresse).catch(() => {})
+        })
       })
 
       clusterGroup.addLayer(marker)
@@ -206,7 +237,7 @@ function LocateControl({ userPosRef }: { userPosRef: { current: L.LatLng | null 
       L.DomEvent.on(btn, 'click', (e) => {
         L.DomEvent.stopPropagation(e)
         if (userPosRef.current) {
-          map.flyTo(userPosRef.current, Math.max(map.getZoom(), 10), { duration: 1 })
+          map.flyTo(userPosRef.current, Math.max(map.getZoom(), 12), { duration: 1 })
         } else {
           map.locate({ enableHighAccuracy: true, setView: false })
         }
