@@ -16,7 +16,7 @@ const BRAND_MAP: Record<string, BrandInfo> = {
   costco:         { cssClass: 'brand-costco',        label: 'Co', color: '#005DAA', logoPath: '/brands/costco.svg' },
   metro:          { cssClass: 'brand-metro',         label: 'M',  color: '#E4002B', logoPath: '/brands/metro.svg' },
   supersave:      { cssClass: 'brand-supersave',     label: 'SS', color: '#0071CE' },
-  'canadian tire':{ cssClass: 'brand-canadiantire',  label: 'CT', color: '#C8102E', logoPath: '/brands/canadiantire.png' },
+  'canadian tire':{ cssClass: 'brand-canadiantire',  label: 'CT', color: '#C8102E', logoPath: '/brands/canadiantire.svg' },
   crevier:        { cssClass: 'brand-crevier',       label: 'Cr', color: '#EB0028', logoPath: '/brands/crevier.svg' },
   harnois:        { cssClass: 'brand-harnois',       label: 'H',  color: '#0057A8', logoPath: '/brands/harnois.png' },
   pioneer:        { cssClass: 'brand-pioneer',       label: 'P',  color: '#F7941D' },

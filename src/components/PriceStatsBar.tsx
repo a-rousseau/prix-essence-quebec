@@ -17,10 +17,10 @@ function StatItem({ label, value, highlight, onClick }: StatItemProps) {
       className={`flex flex-col items-center gap-0.5 ${clickable ? 'cursor-pointer select-none active:scale-95 transition-transform' : ''}`}
       onClick={onClick}
     >
-      <span className="text-[10px] uppercase tracking-wider text-gray-500 font-medium text-center leading-tight">
+      <span className="text-[11px] uppercase tracking-wider text-gray-500 font-medium text-center leading-tight">
         {label}
       </span>
-      <span className={`text-base font-bold tabular-nums ${highlight ? 'text-green-600' : 'text-gray-800'} ${clickable ? 'underline decoration-dotted underline-offset-2' : ''}`}>
+      <span className={`text-[24px] font-bold tabular-nums ${highlight ? 'text-green-600' : 'text-gray-800'} ${clickable ? 'underline decoration-dotted underline-offset-2' : ''}`}>
         {value}
       </span>
     </div>
