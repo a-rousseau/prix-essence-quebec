@@ -201,16 +201,17 @@ function LocateControl() {
       iconAnchor: [12, 12],
     })
 
-    function showGeoError(message: string) {
+    function showGeoError(message: string, timeout: number = 4000) {
       const container = map.getContainer()
       const notice = document.createElement('div')
       notice.style.cssText =
         'position:absolute;top:1rem;left:1rem;right:1rem;z-index:2000;' +
         'background:#fef2f2;border:1px solid #fecaca;border-radius:0.5rem;' +
-        'padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);'
+        'padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);' +
+        'line-height:1.5;max-height:150px;overflow:auto;'
       notice.textContent = message
       container.appendChild(notice)
-      setTimeout(() => notice.remove(), 4000)
+      setTimeout(() => notice.remove(), timeout)
     }
 
     function locate(flyTo: boolean) {
@@ -228,7 +229,10 @@ function LocateControl() {
         (err) => {
           console.warn('Geolocation error:', err)
           if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
-            showGeoError('Accès à la localisation refusé. Vérifiez les permissions dans vos réglages.')
+            showGeoError(
+              'Localisation refusée. Sur iOS: Réglages → Général → Réinitialiser → Réinitialiser localisation et confidentialité. Sur Android: Réglages → Applications → Permissions → Localisation.',
+              8000
+            )
           } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
             showGeoError('Position introuvable. Réessayez dans un moment.')
           } else if (err.code === GeolocationPositionError.TIMEOUT) {
