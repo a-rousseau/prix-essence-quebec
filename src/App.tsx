@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import L from 'leaflet'
 import { Map } from './components/Map'
 import { PriceStatsBar } from './components/PriceStatsBar'
+import { SearchBar } from './components/SearchBar'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { useStations } from './hooks/useStations'
 
@@ -24,6 +25,7 @@ export default function App() {
       )}
 
       <Map stations={stations} onMapReady={handleMapReady} />
+      <SearchBar map={mapInstance} />
 
       {stations.length > 0 && (
         <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} />
