@@ -204,7 +204,7 @@ function UserLocation({ userPosRef }: { userPosRef: { current: L.LatLng | null }
         markerRef.current = L.marker(e.latlng, { icon, zIndexOffset: 1000 })
           .addTo(map)
       }
-      map.setView(e.latlng, 10)
+      map.setView(e.latlng, 12)
     })
 
     return () => {
@@ -236,11 +236,9 @@ function LocateControl({ userPosRef }: { userPosRef: { current: L.LatLng | null 
 
       L.DomEvent.on(btn, 'click', (e) => {
         L.DomEvent.stopPropagation(e)
-        if (userPosRef.current) {
-          map.flyTo(userPosRef.current, Math.max(map.getZoom(), 12), { duration: 1 })
-        } else {
-          map.locate({ enableHighAccuracy: true, setView: false })
-        }
+        // Always call locate — this triggers the browser permission prompt on first tap.
+        // Once locationfound fires, setView handles the fly-to.
+        map.locate({ enableHighAccuracy: true, setView: false })
       })
 
       L.DomEvent.disableClickPropagation(btn)
