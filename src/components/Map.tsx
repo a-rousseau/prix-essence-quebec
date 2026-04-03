@@ -48,7 +48,6 @@ function createStationCard(s: Station): string {
       <div class="station-card-details">
         <div class="station-card-details-inner">
           <div class="station-card-header">
-            ${badgeHtml}
             <div>
               <div class="station-card-fullname">${s.nom}</div>
               <div class="station-card-address">${s.adresse}</div>
