@@ -314,7 +314,7 @@ html, body, #root {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-.station-card-directions a {
+.leaflet-container a.station-card-directions {
   color: #fff;
   text-decoration: none;
 }
