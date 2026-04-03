@@ -179,7 +179,14 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
   return null
 }
 
-function UserLocation({ userPosRef }: { userPosRef: { current: L.LatLng | null } }) {
+function isStandalone(): boolean {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
+  )
+}
+
+function LocateControl() {
   const map = useMap()
   const markerRef = useRef<L.Marker | null>(null)
 
@@ -194,35 +201,26 @@ function UserLocation({ userPosRef }: { userPosRef: { current: L.LatLng | null }
       iconAnchor: [12, 12],
     })
 
-    map.locate({ enableHighAccuracy: true })
-
-    map.on('locationfound', (e) => {
-      userPosRef.current = e.latlng
-      if (markerRef.current) {
-        markerRef.current.setLatLng(e.latlng)
-      } else {
-        markerRef.current = L.marker(e.latlng, { icon, zIndexOffset: 1000 })
-          .addTo(map)
-      }
-      map.setView(e.latlng, 12)
-    })
-
-    return () => {
-      map.off('locationfound')
-      if (markerRef.current) {
-        markerRef.current.remove()
-        markerRef.current = null
-      }
+    function locate(flyTo: boolean) {
+      if (!navigator.geolocation) return
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude)
+          if (markerRef.current) {
+            markerRef.current.setLatLng(latlng)
+          } else {
+            markerRef.current = L.marker(latlng, { icon, zIndexOffset: 1000 }).addTo(map)
+          }
+          if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
+        },
+        (err) => { console.warn('Geolocation error:', err) },
+        { enableHighAccuracy: true }
+      )
     }
-  }, [map, userPosRef])
 
-  return null
-}
+    // Auto-locate on load only in browser mode; standalone requires a user gesture
+    if (!isStandalone()) locate(true)
 
-function LocateControl({ userPosRef }: { userPosRef: { current: L.LatLng | null } }) {
-  const map = useMap()
-
-  useEffect(() => {
     const control = new L.Control({ position: 'topright' })
 
     control.onAdd = () => {
@@ -236,9 +234,7 @@ function LocateControl({ userPosRef }: { userPosRef: { current: L.LatLng | null 
 
       L.DomEvent.on(btn, 'click', (e) => {
         L.DomEvent.stopPropagation(e)
-        // Always call locate — this triggers the browser permission prompt on first tap.
-        // Once locationfound fires, setView handles the fly-to.
-        map.locate({ enableHighAccuracy: true, setView: false })
+        locate(true)
       })
 
       L.DomEvent.disableClickPropagation(btn)
@@ -246,8 +242,14 @@ function LocateControl({ userPosRef }: { userPosRef: { current: L.LatLng | null 
     }
 
     control.addTo(map)
-    return () => { control.remove() }
-  }, [map, userPosRef])
+    return () => {
+      control.remove()
+      if (markerRef.current) {
+        markerRef.current.remove()
+        markerRef.current = null
+      }
+    }
+  }, [map])
 
   return null
 }
@@ -264,8 +266,6 @@ interface MapProps {
 }
 
 export function Map({ stations, onMapReady }: MapProps) {
-  const userPosRef = useRef<L.LatLng | null>(null)
-
   return (
     <MapContainer
       center={[46.8139, -71.2082]}
@@ -281,8 +281,7 @@ export function Map({ stations, onMapReady }: MapProps) {
       <ZoomControl position="topright" />
       <MapController onMapReady={onMapReady} />
       <ClusterLayer stations={stations} />
-      <UserLocation userPosRef={userPosRef} />
-      <LocateControl userPosRef={userPosRef} />
+      <LocateControl />
     </MapContainer>
   )
 }

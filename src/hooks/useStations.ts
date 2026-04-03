@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Station, GeoJsonResponse } from '../types/station'
-import { getCached, setCached } from '../lib/cache'
+import { getCached, setCached, clearCache } from '../lib/cache'
 import { parsePrice } from '../lib/parsePrice'
 
 const GEOJSON_URL = 'https://regieessencequebec.ca/stations.geojson.gz'
@@ -10,6 +10,7 @@ interface UseStationsResult {
   loading: boolean
   error: string | null
   lastUpdated: string | null
+  refresh: () => void
 }
 
 function parseGeoJson(data: GeoJsonResponse): { stations: Station[]; lastUpdated: string } {
@@ -48,6 +49,14 @@ export function useStations(): UseStationsResult {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [fetchKey, setFetchKey] = useState(0)
+
+  const refresh = useCallback(() => {
+    clearCache()
+    setLoading(true)
+    setError(null)
+    setFetchKey(k => k + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -91,7 +100,7 @@ export function useStations(): UseStationsResult {
 
     fetchStations()
     return () => { cancelled = true }
-  }, [])
+  }, [fetchKey])
 
-  return { stations, loading, error, lastUpdated }
+  return { stations, loading, error, lastUpdated, refresh }
 }

@@ -6,7 +6,7 @@ import { LoadingSpinner } from './components/LoadingSpinner'
 import { useStations } from './hooks/useStations'
 
 export default function App() {
-  const { stations, loading, error, lastUpdated } = useStations()
+  const { stations, loading, error, lastUpdated, refresh } = useStations()
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
 
   const handleMapReady = useCallback((map: L.Map) => {
@@ -26,7 +26,7 @@ export default function App() {
       <Map stations={stations} onMapReady={handleMapReady} />
 
       {stations.length > 0 && (
-        <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} />
+        <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} />
       )}
     </div>
   )

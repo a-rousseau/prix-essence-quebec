@@ -293,10 +293,10 @@ html, body, #root {
   justify-content: center;
   width: 30px;
   height: 30px;
-  background: white;
+  background: #2563eb;
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  color: #444;
+  color: #fff;
   cursor: pointer;
   box-shadow: none;
   padding: 0;
@@ -305,8 +305,8 @@ html, body, #root {
 }
 
 .leaflet-control-locate:hover {
-  background: #f4f4f4;
-  color: #2563eb;
+  background: #153989;
+  color: #fff;
 }
 
 /* ── Leaflet overrides ── */

@@ -29,6 +29,14 @@ export function setCached(data: StationsApiResponse): void {
   }
 }
 
+export function clearCache(): void {
+  try {
+    localStorage.removeItem(CACHE_KEY)
+  } catch {
+    // ignore
+  }
+}
+
 export function getCacheAge(): number | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY)
