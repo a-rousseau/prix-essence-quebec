@@ -1,0 +1,9 @@
+node_modules
+dist
+deno.lock
+
+# Local Netlify folder
+.netlify
+
+# Playwright MCP
+.playwright-mcp
