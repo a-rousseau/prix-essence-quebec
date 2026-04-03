@@ -19,7 +19,7 @@ export default function App() {
       {loading && <LoadingSpinner />}
 
       {error && (
-        <div className="absolute top-4 left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg">
+        <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg" style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}>
           <strong>Erreur:</strong> {error}
         </div>
       )}
