@@ -44,6 +44,8 @@ function formatTime(isoString: string | null): string {
   }
 }
 
+const SAFE_AREA_PADDING = { paddingLeft: 'env(safe-area-inset-left, 0px)', paddingRight: 'env(safe-area-inset-right, 0px)' }
+
 function flyToStation(map: L.Map, station: Station) {
   map.flyTo([station.lat, station.lng], 16, { duration: 1.2 })
 }
@@ -104,10 +106,7 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceSt
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg"
-      style={{
-        paddingLeft: 'env(safe-area-inset-left, 0px)',
-        paddingRight: 'env(safe-area-inset-right, 0px)',
-      }}
+      style={SAFE_AREA_PADDING}
     >
       <div className="flex items-center justify-around px-4 pt-2 pb-1">
         <StatItem

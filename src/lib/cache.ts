@@ -44,6 +44,14 @@ export function getCachedLastUpdated(): string | null {
   return getRawEntry()?.data.lastUpdated ?? null
 }
 
+// Returns both the cached data (null if expired) and the lastUpdated timestamp — single JSON.parse
+export function getCachedEntry(): { data: StationsApiResponse | null; lastUpdated: string | null } {
+  const entry = getRawEntry()
+  if (!entry) return { data: null, lastUpdated: null }
+  const data = Date.now() - entry.fetchedAt <= CACHE_TTL_MS ? entry.data : null
+  return { data, lastUpdated: entry.data.lastUpdated }
+}
+
 export function setCached(data: StationsApiResponse): void {
   try {
     const entry: CacheEntry = { data, fetchedAt: Date.now() }

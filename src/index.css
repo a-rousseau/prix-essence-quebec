@@ -118,15 +118,29 @@ html, body, #root {
 
 .station-card.expanded {
   width: max-content;
+  transition: width 0.15s ease;
 }
 
 .station-card-details-inner {
   overflow: hidden;
   padding: 0 8px;
+  font-size: 14px;
 }
 
 .station-card.expanded .station-card-details-inner {
   padding-top: 8px;
+}
+
+.station-card.expanded .station-card-price {
+  font-size: 24px;
+  font-weight: 900;
+  transition: font-size 0.15s ease, font-weight 0.15s ease;
+}
+
+.station-card.expanded .brand-logo {
+  width: 90px;
+  height: 90px;
+  transition: width 0.15s ease, height 0.15s ease;
 }
 
 .station-card-sep {
@@ -143,21 +157,18 @@ html, body, #root {
 }
 
 .station-card-fullname {
-  font-size: 11px;
   font-weight: 700;
   color: #111827;
   line-height: 1.3;
 }
 
 .station-card-address {
-  font-size: 11px;
   color: #374151;
   line-height: 1.3;
   margin-top: 1px;
 }
 
 .station-card-region {
-  font-size: 10px;
   color: #9ca3af;
   margin-top: 1px;
 }
@@ -173,7 +184,6 @@ html, body, #root {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -193,7 +203,6 @@ html, body, #root {
   padding: 6px 10px;
   background: #1e3a5f;
   color: white;
-  font-size: 11px;
   font-weight: 600;
   border-radius: 6px;
   text-decoration: none;

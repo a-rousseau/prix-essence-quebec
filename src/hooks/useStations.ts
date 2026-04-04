@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Station, GeoJsonResponse } from '../types/station'
-import { getCached, setCached, clearCache, getCachedLastUpdated } from '../lib/cache'
+import { getCachedEntry, setCached, clearCache } from '../lib/cache'
 import { parsePrice } from '../lib/parsePrice'
 
 const GEOJSON_URL = 'https://regieessencequebec.ca/stations.geojson.gz'
@@ -68,8 +68,8 @@ export function useStations(): UseStationsResult {
     let cancelled = false
 
     async function fetchStations() {
-      // Check localStorage cache first
-      const cached = getCached()
+      // Check localStorage cache first — single JSON.parse for both data and timestamp
+      const { data: cached, lastUpdated: cachedLastUpdated } = getCachedEntry()
       if (cached) {
         if (!cancelled) {
           setStations(cached.stations)
@@ -88,9 +88,8 @@ export function useStations(): UseStationsResult {
         const data: GeoJsonResponse = await response.json()
 
         // If the source data hasn't changed, bump the cache TTL and reuse existing parsed data
-        const cachedLastUpdated = getCachedLastUpdated()
         if (cachedLastUpdated && data.metadata?.generated_at === cachedLastUpdated) {
-          const existing = getCached()
+          const { data: existing } = getCachedEntry()
           if (!cancelled && existing) {
             setCached(existing)
             setStations(existing.stations)

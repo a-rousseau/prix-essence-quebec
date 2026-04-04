@@ -39,6 +39,7 @@ function buildLabel(p: PhotonFeature['properties']): { label: string; sublabel: 
 }
 
 const PHOTON_BASE_URL = 'https://photon.komoot.io/api/?lang=fr&limit=6&lat=46.8&lon=-71.2&q='
+const INPUT_STYLE = { fontSize: '16px' }
 
 interface SearchBarProps {
   map: L.Map | null
@@ -150,7 +151,7 @@ export function SearchBar({ map }: SearchBarProps) {
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Rechercher une adresse..."
           className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
-          style={{ fontSize: '16px' }}
+          style={INPUT_STYLE}
         />
 
         {query && (
@@ -170,7 +171,7 @@ export function SearchBar({ map }: SearchBarProps) {
       {open && (
         <ul className="mt-1 bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg overflow-hidden">
           {results.map((r, i) => (
-            <li key={i}>
+            <li key={`${r.lat},${r.lng}`}>
               <button
                 className={`w-full text-left px-4 py-2.5 flex flex-col gap-0.5 transition-colors ${i === activeIdx ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                 onMouseDown={() => select(r)}

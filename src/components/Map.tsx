@@ -124,6 +124,7 @@ function createStationCard(s: Station): string {
 
 function ClusterLayer({ stations }: ClusterLayerProps) {
   const map = useMap()
+  const tooltipElsRef = useRef(new Set<HTMLElement>())
 
   useEffect(() => {
     if (stations.length === 0) return
@@ -142,7 +143,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
     const highThreshold = lowest + third * 2
 
     const clusterGroup = L.markerClusterGroup(CLUSTER_GROUP_OPTIONS)
-    const tooltipEls = new Set<HTMLElement>()
+    const tooltipEls = tooltipElsRef.current
 
     for (const s of stations) {
       const marker = L.circleMarker([s.lat, s.lng], {
@@ -218,6 +219,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
 
     return () => {
       map.removeLayer(clusterGroup)
+      tooltipEls.clear()
     }
   }, [stations, map])
 
