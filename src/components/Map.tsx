@@ -70,6 +70,9 @@ function createStationCard(s: Station): string {
             data-ad-format="auto"
             data-full-width-responsive="true"></ins>
           <div class="station-card-sep"></div>
+          <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
         </div>
       </div>
     </div>`
@@ -150,12 +153,13 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
             el.style.zIndex = '1000'
             map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
             const ins = el.querySelector<HTMLElement>('.adsbygoogle')
-            console.log('Checking ad for station:', s.nom, ins);
+            console.log('Checking ad for station:', s.nom, ins)
             if (ins && !ins.dataset.adsbygoogleStatus) {
-              console.log('Loading ad for station:', s.nom);
+              console.log('Loading ad for station:', s.nom)
               const w = window as unknown as { adsbygoogle: object[] }
               w.adsbygoogle = w.adsbygoogle || []
               w.adsbygoogle.push({})
+              console.log('Ad load triggered for station:', w.adsbygoogle)
             }
           } else {
             el.style.zIndex = ''
