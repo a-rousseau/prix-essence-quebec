@@ -19,30 +19,29 @@ function isValidEntry(entry: unknown): entry is CacheEntry {
   )
 }
 
-export function getCached(): StationsApiResponse | null {
+// Parse localStorage once — returns the raw entry regardless of TTL
+function getRawEntry(): CacheEntry | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY)
     if (!raw) return null
     const entry: unknown = JSON.parse(raw)
     if (!isValidEntry(entry)) { localStorage.removeItem(CACHE_KEY); return null }
-    if (Date.now() - entry.fetchedAt > CACHE_TTL_MS) return null
-    return entry.data
+    return entry
   } catch {
     return null
   }
 }
 
-// Returns the cached lastUpdated even if the cache is expired — used for conditional fetching
+export function getCached(): StationsApiResponse | null {
+  const entry = getRawEntry()
+  if (!entry) return null
+  if (Date.now() - entry.fetchedAt > CACHE_TTL_MS) return null
+  return entry.data
+}
+
+// Returns lastUpdated even if cache is expired — avoids a second JSON.parse
 export function getCachedLastUpdated(): string | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    const entry: unknown = JSON.parse(raw)
-    if (!isValidEntry(entry)) return null
-    return entry.data.lastUpdated ?? null
-  } catch {
-    return null
-  }
+  return getRawEntry()?.data.lastUpdated ?? null
 }
 
 export function setCached(data: StationsApiResponse): void {
@@ -61,4 +60,3 @@ export function clearCache(): void {
     // ignore
   }
 }
-

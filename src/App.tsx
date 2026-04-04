@@ -6,6 +6,8 @@ import { SearchBar } from './components/SearchBar'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { useStations } from './hooks/useStations'
 
+const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
+
 export default function App() {
   const { stations, loading, error, lastUpdated, refresh } = useStations()
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
@@ -19,7 +21,7 @@ export default function App() {
       {loading && <LoadingSpinner />}
 
       {error && (
-        <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg" style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}>
+        <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg" style={ERROR_STYLE}>
           <strong>Erreur:</strong> {error}
         </div>
       )}

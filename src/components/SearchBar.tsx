@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import L from 'leaflet'
+import type L from 'leaflet'
 
 interface PhotonFeature {
   geometry: { coordinates: [number, number] }
@@ -38,6 +38,8 @@ function buildLabel(p: PhotonFeature['properties']): { label: string; sublabel: 
   }
 }
 
+const PHOTON_BASE_URL = 'https://photon.komoot.io/api/?lang=fr&limit=6&lat=46.8&lon=-71.2&q='
+
 interface SearchBarProps {
   map: L.Map | null
 }
@@ -59,15 +61,7 @@ export function SearchBar({ map }: SearchBarProps) {
     controllerRef.current = new AbortController()
 
     try {
-      const url = new URL('https://photon.komoot.io/api/')
-      url.searchParams.set('q', q)
-      url.searchParams.set('lang', 'fr')
-      url.searchParams.set('limit', '6')
-      // Bias toward Quebec
-      url.searchParams.set('lat', '46.8')
-      url.searchParams.set('lon', '-71.2')
-
-      const res = await fetch(url.toString(), { signal: controllerRef.current.signal })
+      const res = await fetch(PHOTON_BASE_URL + encodeURIComponent(q), { signal: controllerRef.current.signal })
       const data: { features: PhotonFeature[] } = await res.json()
 
       const mapped: SearchResult[] = data.features.map((f) => {

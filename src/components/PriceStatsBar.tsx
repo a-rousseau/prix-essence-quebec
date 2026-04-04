@@ -53,11 +53,11 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceSt
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Track map bounds on move/zoom — throttled to avoid recalculating on every pan pixel
+  // Track map bounds on move/zoom — trailing throttle ensures final position is always captured
   useEffect(() => {
     if (!map) return
     const update = () => {
-      if (throttleRef.current) return
+      if (throttleRef.current) clearTimeout(throttleRef.current)
       throttleRef.current = setTimeout(() => {
         setVisibleBounds(map.getBounds())
         throttleRef.current = null
@@ -89,7 +89,7 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceSt
   const lowestDisplay = stats.lowest !== null ? `${stats.lowest}¢` : '—'
   const visibleDisplay = visibleLowest !== null ? `${visibleLowest}¢` : '—'
   const highestDisplay = stats.highest !== null ? `${stats.highest}¢` : '—'
-  const updatedTime = formatTime(lastUpdated)
+  const updatedTime = useMemo(() => formatTime(lastUpdated), [lastUpdated])
 
   const onClickLowest = useCallback(() => {
     if (map && lowestStation) flyToStation(map, lowestStation)

@@ -60,7 +60,6 @@ html, body, #root {
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  font-family: system-ui, -apple-system, sans-serif;
   width: fit-content;
   overflow: hidden;
   transition: width 0.25s ease;
@@ -309,10 +308,6 @@ html, body, #root {
   color: #fff;
 }
 
-/* ── Leaflet overrides ── */
-.leaflet-container {
-  font-family: system-ui, -apple-system, sans-serif;
-}
 
 /* ── Safe area insets for standalone PWA ── */
 .leaflet-top {

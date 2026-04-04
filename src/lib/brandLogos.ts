@@ -30,11 +30,18 @@ const NORMALIZED_BRAND_MAP: [string, BrandInfo][] = Object.entries(BRAND_MAP).ma
   ([k, v]) => [normalize(k), v]
 )
 
+const GENERIC_EMPTY: BrandInfo = { cssClass: 'brand-generic', label: '⛽', color: '#6b7280' }
+const brandCache = new Map<string, BrandInfo>()
+
 export function getBrand(banniere: string): BrandInfo {
-  if (!banniere) return { cssClass: 'brand-generic', label: '⛽', color: '#6b7280' }
+  if (!banniere) return GENERIC_EMPTY
+  const cached = brandCache.get(banniere)
+  if (cached) return cached
   const key = normalize(banniere)
   for (const [k, v] of NORMALIZED_BRAND_MAP) {
-    if (key.includes(k)) return v
+    if (key.includes(k)) { brandCache.set(banniere, v); return v }
   }
-  return { cssClass: 'brand-generic', label: banniere.substring(0, 2).toUpperCase(), color: '#6b7280' }
+  const generic: BrandInfo = { cssClass: 'brand-generic', label: banniere.substring(0, 2).toUpperCase(), color: '#6b7280' }
+  brandCache.set(banniere, generic)
+  return generic
 }

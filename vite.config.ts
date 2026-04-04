@@ -11,7 +11,6 @@ export default defineConfig({
     netlify(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png'],
       manifest: {
         name: 'Prix Essence Québec',
         short_name: 'Essence QC',
@@ -55,8 +54,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          leaflet: ['leaflet', 'leaflet.markercluster'],
-          'react-leaflet': ['react-leaflet'],
+          'vendor-map': ['leaflet', 'leaflet.markercluster', 'react-leaflet'],
           react: ['react', 'react-dom'],
         },
       },

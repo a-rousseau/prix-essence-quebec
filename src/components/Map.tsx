@@ -10,6 +10,50 @@ interface ClusterLayerProps {
   stations: Station[]
 }
 
+interface LeafletTooltipInternal extends L.Tooltip {
+  _updatePosition(): void
+}
+
+const LOCATION_ICON = L.divIcon({
+  className: '',
+  html: `<div class="user-location-outer">
+           <div class="user-location-pulse"></div>
+           <div class="user-location-dot"></div>
+         </div>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
+})
+
+const LOCATE_BTN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="3"/>
+  <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+  <circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/>
+</svg>`
+
+const CIRCLE_MARKER_BASE = {
+  radius: 8,
+  color: '#fff',
+  weight: 1.5,
+  opacity: 1,
+  fillOpacity: 0.9,
+}
+
+const TOOLTIP_OPTIONS: L.TooltipOptions = {
+  permanent: true,
+  direction: 'top',
+  offset: [0, -8] as L.PointExpression,
+  className: 'station-tooltip',
+  interactive: true,
+}
+
+const CLUSTER_GROUP_OPTIONS: L.MarkerClusterGroupOptions = {
+  iconCreateFunction: createClusterIcon,
+  maxClusterRadius: 60,
+  showCoverageOnHover: false,
+  spiderfyOnMaxZoom: true,
+  disableClusteringAtZoom: 14,
+}
+
 const PRICE_COLORS = {
   low:  '#16a34a',
   mid:  '#f59e0b',
@@ -17,13 +61,11 @@ const PRICE_COLORS = {
   none: '#6b7280',
 }
 
-function getPriceColor(price: number | null, lowest: number, highest: number): string {
+function getPriceColor(price: number | null, lowThreshold: number, highThreshold: number, hasRange: boolean): string {
   if (price === null) return PRICE_COLORS.none
-  const range = highest - lowest
-  if (range === 0) return PRICE_COLORS.mid
-  const third = range / 3
-  if (price <= lowest + third) return PRICE_COLORS.low
-  if (price <= lowest + 2 * third) return PRICE_COLORS.mid
+  if (!hasRange) return PRICE_COLORS.mid
+  if (price <= lowThreshold) return PRICE_COLORS.low
+  if (price <= highThreshold) return PRICE_COLORS.mid
   return PRICE_COLORS.high
 }
 
@@ -31,14 +73,15 @@ function fmt(p: number | null): string {
   return p !== null ? `${p}¢` : '—'
 }
 
+const ESC_MAP: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }
 function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  return s.replace(/[&<>"]/g, c => ESC_MAP[c])
 }
 
 function createStationCard(s: Station): string {
   const brand = getBrand(s.banniere)
   const displayName = esc(s.banniere || s.nom)
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.lat)},${encodeURIComponent(s.lng)}`
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
   const badgeHtml = brand.logoPath
     ? `<img src="${esc(brand.logoPath)}" class="brand-logo" alt="${displayName}" width="28" height="28">`
     : `<span class="brand-badge ${esc(brand.cssClass)}" style="background:${esc(brand.color)}">${esc(brand.label)}</span>`
@@ -92,37 +135,22 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
       if (p < lowest) lowest = p
       if (p > highest) highest = p
     }
+    const hasRange = lowest !== Infinity && highest !== lowest
     if (lowest === Infinity) { lowest = 0; highest = 0 }
+    const third = (highest - lowest) / 3
+    const lowThreshold = lowest + third
+    const highThreshold = lowest + third * 2
 
-    const clusterGroup = L.markerClusterGroup({
-      iconCreateFunction: createClusterIcon,
-      maxClusterRadius: 60,
-      showCoverageOnHover: false,
-      spiderfyOnMaxZoom: true,
-      disableClusteringAtZoom: 14,
-    })
+    const clusterGroup = L.markerClusterGroup(CLUSTER_GROUP_OPTIONS)
+    const tooltipEls = new Set<HTMLElement>()
 
-    stations.forEach((s) => {
+    for (const s of stations) {
       const marker = L.circleMarker([s.lat, s.lng], {
-        radius: 8,
-        fillColor: getPriceColor(s.prixRegulier, lowest, highest),
-        color: '#fff',
-        weight: 1.5,
-        opacity: 1,
-        fillOpacity: 0.9,
+        ...CIRCLE_MARKER_BASE,
+        fillColor: getPriceColor(s.prixRegulier, lowThreshold, highThreshold, hasRange),
       })
 
-      marker.bindTooltip(createStationCard(s), {
-        permanent: true,
-        direction: 'top',
-        offset: [0, -8],
-        className: 'station-tooltip',
-        interactive: true,
-      })
-
-      interface LeafletTooltipInternal extends L.Tooltip {
-        _updatePosition(): void
-      }
+      marker.bindTooltip(() => createStationCard(s), TOOLTIP_OPTIONS)
 
       marker.on('tooltipopen', (e) => {
         const el = e.tooltip.getElement()
@@ -144,15 +172,15 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
           requestAnimationFrame(tick)
         }
 
+        tooltipEls.add(el)
+
         compact?.addEventListener('click', (evt) => {
           evt.stopPropagation()
           const isExpanding = !card?.classList.contains('expanded')
           card?.classList.toggle('expanded')
           // Bring this tooltip to the front by raising its z-index above all others
           if (isExpanding) {
-            document.querySelectorAll<HTMLElement>('.station-tooltip').forEach(t => {
-              t.style.zIndex = ''
-            })
+            for (const t of tooltipEls) t.style.zIndex = ''
             el.style.zIndex = '1000'
             map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
             const ins = el.querySelector<HTMLElement>('.adsbygoogle')
@@ -184,7 +212,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
       })
 
       clusterGroup.addLayer(marker)
-    })
+    }
 
     map.addLayer(clusterGroup)
 
@@ -208,16 +236,6 @@ function LocateControl() {
   const markerRef = useRef<L.Marker | null>(null)
 
   useEffect(() => {
-    const icon = L.divIcon({
-      className: '',
-      html: `<div class="user-location-outer">
-               <div class="user-location-pulse"></div>
-               <div class="user-location-dot"></div>
-             </div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-    })
-
     function showGeoError(message: string, timeout: number = 4000) {
       const container = map.getContainer()
       const notice = document.createElement('div')
@@ -239,7 +257,7 @@ function LocateControl() {
           if (markerRef.current) {
             markerRef.current.setLatLng(latlng)
           } else {
-            markerRef.current = L.marker(latlng, { icon, zIndexOffset: 1000 }).addTo(map)
+            markerRef.current = L.marker(latlng, { icon: LOCATION_ICON, zIndexOffset: 1000 }).addTo(map)
           }
           if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
         },
@@ -269,11 +287,7 @@ function LocateControl() {
     control.onAdd = () => {
       const btn = L.DomUtil.create('button', 'leaflet-control-locate')
       btn.title = 'Ma position'
-      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-        <circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/>
-      </svg>`
+      btn.innerHTML = LOCATE_BTN_SVG
 
       L.DomEvent.on(btn, 'click', (e) => {
         L.DomEvent.stopPropagation(e)
