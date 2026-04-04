@@ -85,11 +85,14 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
   useEffect(() => {
     if (stations.length === 0) return
 
-    const prices = stations
-      .map((s) => s.prixRegulier)
-      .filter((p): p is number => p !== null)
-    const lowest = prices.length ? Math.min(...prices) : 0
-    const highest = prices.length ? Math.max(...prices) : 0
+    let lowest = Infinity, highest = -Infinity
+    for (const s of stations) {
+      const p = s.prixRegulier
+      if (p === null) continue
+      if (p < lowest) lowest = p
+      if (p > highest) highest = p
+    }
+    if (lowest === Infinity) { lowest = 0; highest = 0 }
 
     const clusterGroup = L.markerClusterGroup({
       iconCreateFunction: createClusterIcon,

@@ -14,29 +14,35 @@ interface UseStationsResult {
 }
 
 function parseGeoJson(data: GeoJsonResponse): { stations: Station[]; lastUpdated: string } {
-  const stations: Station[] = data.features
-    .filter((f) => f.geometry?.coordinates?.length === 2)
-    .map((f) => {
-      const p = f.properties
-      const [lng, lat] = f.geometry.coordinates
+  const stations: Station[] = []
 
-      const regulier = p.Prices?.find((x) => x.GasType === 'Régulier')
-      const super_ = p.Prices?.find((x) => x.GasType === 'Super')
-      const diesel = p.Prices?.find((x) => x.GasType === 'Diesel')
+  for (const f of data.features) {
+    if (f.geometry?.coordinates?.length !== 2) continue
+    const p = f.properties
+    const [lng, lat] = f.geometry.coordinates
 
-      return {
-        nom: p.Name ?? '',
-        banniere: p.brand ?? '',
-        adresse: p.Address ?? '',
-        region: p.Region ?? '',
-        codePostal: p.PostalCode ?? '',
-        lat,
-        lng,
-        prixRegulier: regulier?.IsAvailable ? parsePrice(regulier.Price) : null,
-        prixSuper: super_?.IsAvailable ? parsePrice(super_.Price) : null,
-        prixDiesel: diesel?.IsAvailable ? parsePrice(diesel.Price) : null,
+    let regulier = null, super_ = null, diesel = null
+    if (p.Prices) {
+      for (const x of p.Prices) {
+        if (x.GasType === 'Régulier') regulier = x
+        else if (x.GasType === 'Super') super_ = x
+        else if (x.GasType === 'Diesel') diesel = x
       }
+    }
+
+    stations.push({
+      nom: p.Name ?? '',
+      banniere: p.brand ?? '',
+      adresse: p.Address ?? '',
+      region: p.Region ?? '',
+      codePostal: p.PostalCode ?? '',
+      lat,
+      lng,
+      prixRegulier: regulier?.IsAvailable ? parsePrice(regulier.Price) : null,
+      prixSuper: super_?.IsAvailable ? parsePrice(super_.Price) : null,
+      prixDiesel: diesel?.IsAvailable ? parsePrice(diesel.Price) : null,
     })
+  }
 
   return {
     stations,
@@ -89,6 +95,7 @@ export function useStations(): UseStationsResult {
             setCached(existing)
             setStations(existing.stations)
             setLastUpdated(existing.lastUpdated)
+            setLoading(false)
             return
           }
         }
