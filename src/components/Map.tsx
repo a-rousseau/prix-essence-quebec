@@ -63,6 +63,13 @@ function createStationCard(s: Station): string {
             Obtenir l'itinéraire
           </a>
           <div class="station-card-sep"></div>
+          <ins class="adsbygoogle"
+            style="display:block;width:250px"
+            data-ad-client="ca-pub-7169608195886569"
+            data-ad-slot="3373913657"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <div class="station-card-sep"></div>
         </div>
       </div>
     </div>`
@@ -142,6 +149,14 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
             })
             el.style.zIndex = '1000'
             map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
+            const ins = el.querySelector<HTMLElement>('.adsbygoogle')
+            console.log('Checking ad for station:', s.nom, ins);
+            if (ins && !ins.dataset.adsbygoogleStatus) {
+              console.log('Loading ad for station:', s.nom);
+              const w = window as unknown as { adsbygoogle: object[] }
+              w.adsbygoogle = w.adsbygoogle || []
+              w.adsbygoogle.push({})
+            }
           } else {
             el.style.zIndex = ''
           }

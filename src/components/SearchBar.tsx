@@ -155,7 +155,8 @@ export function SearchBar({ map }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Rechercher une adresse..."
-          className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg text-sm text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+          className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+          style={{ fontSize: '16px' }}
         />
 
         {query && (
