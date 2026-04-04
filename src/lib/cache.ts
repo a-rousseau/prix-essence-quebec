@@ -8,11 +8,23 @@ interface CacheEntry {
   fetchedAt: number
 }
 
+function isValidEntry(entry: unknown): entry is CacheEntry {
+  if (!entry || typeof entry !== 'object') return false
+  const e = entry as Record<string, unknown>
+  return (
+    typeof e.fetchedAt === 'number' &&
+    e.data !== null &&
+    typeof e.data === 'object' &&
+    Array.isArray((e.data as Record<string, unknown>).stations)
+  )
+}
+
 export function getCached(): StationsApiResponse | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY)
     if (!raw) return null
-    const entry: CacheEntry = JSON.parse(raw)
+    const entry: unknown = JSON.parse(raw)
+    if (!isValidEntry(entry)) { localStorage.removeItem(CACHE_KEY); return null }
     if (Date.now() - entry.fetchedAt > CACHE_TTL_MS) return null
     return entry.data
   } catch {

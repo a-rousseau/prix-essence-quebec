@@ -31,10 +31,10 @@ export default defineConfig({
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
-            urlPattern: /^\/api\/stations$/,
+            urlPattern: /^https:\/\/regieessencequebec\.ca\/stations\.geojson\.gz$/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'stations-api',
+              cacheName: 'stations-geojson',
               networkTimeoutSeconds: 10,
               expiration: { maxAgeSeconds: 1800 },
             },
@@ -51,4 +51,15 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          leaflet: ['leaflet', 'leaflet.markercluster'],
+          'react-leaflet': ['react-leaflet'],
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
 })

@@ -31,13 +31,17 @@ function fmt(p: number | null): string {
   return p !== null ? `${p}¢` : '—'
 }
 
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 function createStationCard(s: Station): string {
   const brand = getBrand(s.banniere)
-  const displayName = s.banniere || s.nom
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
+  const displayName = esc(s.banniere || s.nom)
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.lat)},${encodeURIComponent(s.lng)}`
   const badgeHtml = brand.logoPath
-    ? `<img src="${brand.logoPath}" class="brand-logo" alt="${displayName}" width="28" height="28">`
-    : `<span class="brand-badge ${brand.cssClass}" style="background:${brand.color}">${brand.label}</span>`
+    ? `<img src="${esc(brand.logoPath)}" class="brand-logo" alt="${displayName}" width="28" height="28">`
+    : `<span class="brand-badge ${esc(brand.cssClass)}" style="background:${esc(brand.color)}">${esc(brand.label)}</span>`
   return `
     <div class="station-card">
 
@@ -49,9 +53,9 @@ function createStationCard(s: Station): string {
         <div class="station-card-details-inner">
           <div class="station-card-header">
             <div>
-              <div class="station-card-fullname">${s.nom}</div>
-              <div class="station-card-address">${s.adresse}</div>
-              <div class="station-card-region">${s.codePostal} · ${s.region}</div>
+              <div class="station-card-fullname">${esc(s.nom)}</div>
+              <div class="station-card-address">${esc(s.adresse)}</div>
+              <div class="station-card-region">${esc(s.codePostal)} · ${esc(s.region)}</div>
             </div>
           </div>
           <div class="station-card-prices">
@@ -59,7 +63,7 @@ function createStationCard(s: Station): string {
             <div class="station-card-price-row"><span>Super</span><strong>${fmt(s.prixSuper)}</strong></div>
             <div class="station-card-price-row"><span>Diesel</span><strong>${fmt(s.prixDiesel)}</strong></div>
           </div>
-          <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener">
+          <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">
             Obtenir l'itinéraire
           </a>
           <div class="station-card-sep"></div>
@@ -70,9 +74,6 @@ function createStationCard(s: Station): string {
             data-ad-format="auto"
             data-full-width-responsive="true"></ins>
           <div class="station-card-sep"></div>
-          <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
         </div>
       </div>
     </div>`
@@ -153,13 +154,10 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
             el.style.zIndex = '1000'
             map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
             const ins = el.querySelector<HTMLElement>('.adsbygoogle')
-            console.log('Checking ad for station:', s.nom, ins)
             if (ins && !ins.dataset.adsbygoogleStatus) {
-              console.log('Loading ad for station:', s.nom)
               const w = window as unknown as { adsbygoogle: object[] }
               w.adsbygoogle = w.adsbygoogle || []
               w.adsbygoogle.push({})
-              console.log('Ad load triggered for station:', w.adsbygoogle)
             }
           } else {
             el.style.zIndex = ''
@@ -246,7 +244,6 @@ function LocateControl() {
           if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
         },
         (err) => {
-          console.warn('Geolocation error:', err)
           if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
             showGeoError(
               'Localisation refusée. Sur iOS: Réglages → Général → Réinitialiser → Réinitialiser localisation et confidentialité. Sur Android: Réglages → Applications → Permissions → Localisation.',
