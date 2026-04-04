@@ -26,11 +26,15 @@ function normalize(name: string): string {
   return name.toLowerCase().replace(/[\s\-_.]/g, '').replace(/[^a-z]/g, '')
 }
 
+const NORMALIZED_BRAND_MAP: [string, BrandInfo][] = Object.entries(BRAND_MAP).map(
+  ([k, v]) => [normalize(k), v]
+)
+
 export function getBrand(banniere: string): BrandInfo {
   if (!banniere) return { cssClass: 'brand-generic', label: '⛽', color: '#6b7280' }
   const key = normalize(banniere)
-  for (const [k, v] of Object.entries(BRAND_MAP)) {
-    if (key.includes(normalize(k))) return v
+  for (const [k, v] of NORMALIZED_BRAND_MAP) {
+    if (key.includes(k)) return v
   }
   return { cssClass: 'brand-generic', label: banniere.substring(0, 2).toUpperCase(), color: '#6b7280' }
 }

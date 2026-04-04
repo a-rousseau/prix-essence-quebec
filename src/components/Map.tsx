@@ -81,7 +81,6 @@ function createStationCard(s: Station): string {
 
 function ClusterLayer({ stations }: ClusterLayerProps) {
   const map = useMap()
-  const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
 
   useEffect(() => {
     if (stations.length === 0) return
@@ -185,11 +184,9 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
     })
 
     map.addLayer(clusterGroup)
-    clusterRef.current = clusterGroup
 
     return () => {
       map.removeLayer(clusterGroup)
-      clusterRef.current = null
     }
   }, [stations, map])
 

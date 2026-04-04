@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Station, GeoJsonResponse } from '../types/station'
-import { getCached, setCached, clearCache } from '../lib/cache'
+import { getCached, setCached, clearCache, getCachedLastUpdated } from '../lib/cache'
 import { parsePrice } from '../lib/parsePrice'
 
 const GEOJSON_URL = 'https://regieessencequebec.ca/stations.geojson.gz'
@@ -80,6 +80,19 @@ export function useStations(): UseStationsResult {
         }
         // Browser auto-decompresses gzip via Content-Encoding header
         const data: GeoJsonResponse = await response.json()
+
+        // If the source data hasn't changed, bump the cache TTL and reuse existing parsed data
+        const cachedLastUpdated = getCachedLastUpdated()
+        if (cachedLastUpdated && data.metadata?.generated_at === cachedLastUpdated) {
+          const existing = getCached()
+          if (!cancelled && existing) {
+            setCached(existing)
+            setStations(existing.stations)
+            setLastUpdated(existing.lastUpdated)
+            return
+          }
+        }
+
         const { stations, lastUpdated } = parseGeoJson(data)
 
         if (!cancelled) {

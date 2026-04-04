@@ -32,6 +32,19 @@ export function getCached(): StationsApiResponse | null {
   }
 }
 
+// Returns the cached lastUpdated even if the cache is expired — used for conditional fetching
+export function getCachedLastUpdated(): string | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const entry: unknown = JSON.parse(raw)
+    if (!isValidEntry(entry)) return null
+    return entry.data.lastUpdated ?? null
+  } catch {
+    return null
+  }
+}
+
 export function setCached(data: StationsApiResponse): void {
   try {
     const entry: CacheEntry = { data, fetchedAt: Date.now() }
@@ -49,13 +62,3 @@ export function clearCache(): void {
   }
 }
 
-export function getCacheAge(): number | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    const entry: CacheEntry = JSON.parse(raw)
-    return Date.now() - entry.fetchedAt
-  } catch {
-    return null
-  }
-}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import L from 'leaflet'
 import type { Station } from '../types/station'
 import { useMapStats } from '../hooks/useMapStats'
@@ -51,48 +51,62 @@ function flyToStation(map: L.Map, station: Station) {
 export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceStatsBarProps) {
   const stats = useMapStats(stations)
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
+  const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Track map bounds on move/zoom
+  // Track map bounds on move/zoom — throttled to avoid recalculating on every pan pixel
   useEffect(() => {
     if (!map) return
-    const update = () => setVisibleBounds(map.getBounds())
+    const update = () => {
+      if (throttleRef.current) return
+      throttleRef.current = setTimeout(() => {
+        setVisibleBounds(map.getBounds())
+        throttleRef.current = null
+      }, 200)
+    }
     update()
     map.on('moveend zoomend', update)
-    return () => { map.off('moveend zoomend', update) }
+    return () => {
+      map.off('moveend zoomend', update)
+      if (throttleRef.current) clearTimeout(throttleRef.current)
+    }
   }, [map])
 
-  // Find station objects for global lowest & highest
-  const lowestStation = useMemo(
-    () => stats.lowest !== null ? stations.find(s => s.prixRegulier === stats.lowest) ?? null : null,
-    [stations, stats.lowest]
-  )
-  const highestStation = useMemo(
-    () => stats.highest !== null ? stations.find(s => s.prixRegulier === stats.highest) ?? null : null,
-    [stations, stats.highest]
-  )
-
-  // Lowest price in the currently visible map area
+  // Lowest price in the currently visible map area — single pass
   const { visibleLowest, visibleLowestStation } = useMemo(() => {
     if (!visibleBounds) return { visibleLowest: null, visibleLowestStation: null }
-    const visible = stations.filter(s => visibleBounds.contains([s.lat, s.lng]))
-    const prices = visible.map(s => s.prixRegulier).filter((p): p is number => p !== null)
-    if (!prices.length) return { visibleLowest: null, visibleLowestStation: null }
-    const min = Math.min(...prices)
-    return { visibleLowest: min, visibleLowestStation: visible.find(s => s.prixRegulier === min) ?? null }
+    let min: number | null = null
+    let minStation: Station | null = null
+    for (const s of stations) {
+      if (!visibleBounds.contains([s.lat, s.lng])) continue
+      const p = s.prixRegulier
+      if (p === null) continue
+      if (min === null || p < min) { min = p; minStation = s }
+    }
+    return { visibleLowest: min, visibleLowestStation: minStation }
   }, [stations, visibleBounds])
 
+  const { lowestStation, highestStation } = stats
   const lowestDisplay = stats.lowest !== null ? `${stats.lowest}¢` : '—'
   const visibleDisplay = visibleLowest !== null ? `${visibleLowest}¢` : '—'
   const highestDisplay = stats.highest !== null ? `${stats.highest}¢` : '—'
   const updatedTime = formatTime(lastUpdated)
 
+  const onClickLowest = useCallback(() => {
+    if (map && lowestStation) flyToStation(map, lowestStation)
+  }, [map, lowestStation])
+  const onClickVisible = useCallback(() => {
+    if (map && visibleLowestStation) flyToStation(map, visibleLowestStation)
+  }, [map, visibleLowestStation])
+  const onClickHighest = useCallback(() => {
+    if (map && highestStation) flyToStation(map, highestStation)
+  }, [map, highestStation])
+
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg"
       style={{
-        paddingBottom: '0px',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
-        paddingRight: 'env(safe-area-inset-right, 0px',
+        paddingRight: 'env(safe-area-inset-right, 0px)',
       }}
     >
       <div className="flex items-center justify-around px-4 pt-2 pb-1">
@@ -100,19 +114,19 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceSt
           label="Plus bas au Québec"
           value={lowestDisplay}
           highlight
-          onClick={map && lowestStation ? () => flyToStation(map, lowestStation) : undefined}
+          onClick={map && lowestStation ? onClickLowest : undefined}
         />
         <div className="w-px h-8 bg-gray-200" />
         <StatItem
           label="Plus bas de la région"
           value={visibleDisplay}
-          onClick={map && visibleLowestStation ? () => flyToStation(map, visibleLowestStation) : undefined}
+          onClick={map && visibleLowestStation ? onClickVisible : undefined}
         />
         <div className="w-px h-8 bg-gray-200" />
         <StatItem
           label="Plus élevé au Québec"
           value={highestDisplay}
-          onClick={map && highestStation ? () => flyToStation(map, highestStation) : undefined}
+          onClick={map && highestStation ? onClickHighest : undefined}
         />
         <div className="w-px h-8 bg-gray-200" />
       </div>
