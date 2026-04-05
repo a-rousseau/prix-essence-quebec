@@ -275,38 +275,58 @@ function LocateControl() {
       closeBtn.addEventListener('click', () => { notice.remove(); clearTimeout(timer) })
     }
 
+    function applyPosition(pos: GeolocationPosition, flyTo: boolean) {
+      const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude)
+      if (markerRef.current) {
+        markerRef.current.setLatLng(latlng)
+      } else {
+        markerRef.current = L.marker(latlng, { icon: LOCATION_ICON, zIndexOffset: 1000 }).addTo(map)
+      }
+      if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
+    }
+
+    function showLocateError(err: GeolocationPositionError) {
+      if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
+        showGeoError(
+          '<p><strong>Localisation refusée</strong></p><p>Pour réactiver la localisation:</p>' +
+          '<ul style="margin:0.4rem 0 0;padding-left:1.2rem;">' +
+          '<li><strong>Sur iOS&nbsp;:</strong> Réglages → Confidentialité → Service de localisation</li>' +
+          '<li><strong>Sur Android&nbsp;:</strong> Réglages → Applications → Permissions → Localisation</li>' +
+          '</ul>' +
+          '<p>Et si ça ne fonctionne toujours pas, veuillez réinitialiser toutes vos préférences de confidentialité et de localisation.</p>',
+          10000
+        )
+      } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+        showGeoError('<strong>Position introuvable.</strong> Réessayez dans un moment.')
+      } else if (err.code === GeolocationPositionError.TIMEOUT) {
+        showGeoError('<strong>Délai dépassé.</strong> Réessayez dans un endroit avec meilleure réception.')
+      } else {
+        showGeoError('<strong>Erreur de géolocalisation.</strong>')
+      }
+    }
+
     function locate(flyTo: boolean) {
       if (!navigator.geolocation) return
+      // First try: low accuracy, fast (uses network/cell — works reliably on Android)
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude)
-          if (markerRef.current) {
-            markerRef.current.setLatLng(latlng)
-          } else {
-            markerRef.current = L.marker(latlng, { icon: LOCATION_ICON, zIndexOffset: 1000 }).addTo(map)
-          }
-          if (flyTo) map.flyTo(latlng, Math.max(map.getZoom(), 12), { duration: 0.8 })
+          applyPosition(pos, flyTo)
+          // Second try in background: refine with GPS if better accuracy available
+          navigator.geolocation.getCurrentPosition(
+            (refinedPos) => applyPosition(refinedPos, false),
+            () => { /* ignore refinement errors — we already have a position */ },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+          )
         },
         (err) => {
-          if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
-            showGeoError(
-              '<p><strong>Localisation refusée</strong></p><p>Pour réactiver la localisation:</p>' +
-              '<ul style="margin:0.4rem 0 0;padding-left:1.2rem;">' +
-              '<li><strong>Sur iOS&nbsp;:</strong> Réglages → Confidentialité → Service de localisation</li>' +
-              '<li><strong>Sur Android&nbsp;:</strong> Réglages → Applications → Permissions → Localisation</li>' +
-              '</ul>'+
-              '<p class="mt-2>Et si ça ne fonctionne toujours pas, veuillez réinitialiser toutes vos préférences de confidentialité et de localisation.</p>',
-              10000
-            )
-          } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-            showGeoError('<strong>Position introuvable.</strong> Réessayez dans un moment.')
-          } else if (err.code === GeolocationPositionError.TIMEOUT) {
-            showGeoError('<strong>Délai dépassé.</strong> La demande de localisation a expiré.')
-          } else {
-            showGeoError('<strong>Erreur de géolocalisation.</strong>')
-          }
+          // Low accuracy failed — try high accuracy as fallback before showing error
+          navigator.geolocation.getCurrentPosition(
+            (pos) => applyPosition(pos, flyTo),
+            () => showLocateError(err),
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+          )
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 30000 }
       )
     }
 

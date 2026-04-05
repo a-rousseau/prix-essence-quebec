@@ -128,8 +128,7 @@ export function SearchBar({ map }: SearchBarProps) {
   return (
     <div
       ref={containerRef}
-      className="absolute z-[1000] left-3 right-14 top-3"
-      style={{ top: 'max(12px, env(safe-area-inset-top, 12px))' }}
+      className="w-full"
     >
       <div className="relative">
         {/* Search icon */}

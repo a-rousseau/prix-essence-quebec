@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import L from 'leaflet'
 import type { Station } from '../types/station'
 import { useMapStats } from '../hooks/useMapStats'
-import { ADS_ENABLED } from '../lib/adConsent'
 
 interface StatItemProps {
   label: string
@@ -33,8 +32,6 @@ interface PriceStatsBarProps {
   lastUpdated: string | null
   map: L.Map | null
   onRefresh: () => void
-  onManageCookies: () => void
-  onTrademarks: () => void
 }
 
 function formatTime(isoString: string | null): string {
@@ -53,7 +50,7 @@ function flyToStation(map: L.Map, station: Station) {
   map.flyTo([station.lat, station.lng], 16, { duration: 1.2 })
 }
 
-export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageCookies, onTrademarks }: PriceStatsBarProps) {
+export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceStatsBarProps) {
   const stats = useMapStats(stations)
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -147,26 +144,6 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageC
                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
                 <path d="M3 21v-5h5"/>
               </svg>
-            </button>
-          </>
-        )}
-        <>
-          <span className="text-gray-300">|</span>
-          <button
-            onClick={onTrademarks}
-            className="text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            Marques & logos
-          </button>
-        </>
-        {ADS_ENABLED && (
-          <>
-            <span className="text-gray-300">|</span>
-            <button
-              onClick={onManageCookies}
-              className="text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              Cookies
             </button>
           </>
         )}
