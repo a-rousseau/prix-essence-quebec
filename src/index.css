@@ -223,21 +223,6 @@ html, body, #root {
   color: white;
 }
 
-.brand-badge {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
-  text-transform: uppercase;
-}
-
-
 .brand-logo {
   width: 45px;
   height: 45px;
@@ -246,19 +231,7 @@ html, body, #root {
 }
 
 
-/* ── Brand colors ── */
-.brand-ultramar     { background-color: #4118e3; }
-.brand-shell        { background-color: #ffc043; }
-.brand-petrocanada  { background-color: #0b80f4; }
-.brand-esso         { background-color: #003087; }
-.brand-couchetard   { background-color: #F16421; }
-.brand-irving       { background-color: #00539B; }
-.brand-pioneer      { background-color: #F7941D; }
-.brand-costco       { background-color: #005DAA; }
-.brand-metro        { background-color: #E4002B; }
-.brand-supersave    { background-color: #0071CE; }
-.brand-canadiantire { background-color: #C8102E; }
-.brand-generic      { background-color: #6b7280; }
+
 .low-price { color: #16a34a; }
 .mid-price { color: #f59e0b; }
 .high-price { color: #dc2626; }

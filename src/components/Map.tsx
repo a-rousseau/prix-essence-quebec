@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, ZoomControl, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet.markercluster'
 import type { Station } from '../types/station'
-import { getBrand } from '../lib/brandLogos'
+import { getBrandLogo } from '../lib/brandLogos'
 import { createClusterIcon } from '../lib/clusterIcon'
 
 interface ClusterLayerProps {
@@ -81,12 +81,9 @@ function esc(s: string): string {
 }
 
 function createStationCard(s: Station): string {
-  const brand = getBrand(s.banniere)
   const displayName = esc(s.banniere || s.nom)
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
-  const badgeHtml = brand.logoPath
-    ? `<img src="${esc(brand.logoPath)}" class="brand-logo" alt="${displayName}" width="28" height="28">`
-    : `<span class="brand-badge ${esc(brand.cssClass)}" style="background:${esc(brand.color)}">${esc(brand.label)}</span>`
+  const badgeHtml = `<img src="${esc(getBrandLogo(s.banniere))}" class="brand-logo" alt="${displayName}" width="28" height="28">`
   return `
     <div class="station-card">
 
