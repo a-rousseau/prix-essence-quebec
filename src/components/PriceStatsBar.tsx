@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import L from 'leaflet'
 import type { Station } from '../types/station'
 import { useMapStats } from '../hooks/useMapStats'
+import { ADS_ENABLED } from '../lib/adConsent'
 
 interface StatItemProps {
   label: string
@@ -32,6 +33,7 @@ interface PriceStatsBarProps {
   lastUpdated: string | null
   map: L.Map | null
   onRefresh: () => void
+  onManageCookies: () => void
 }
 
 function formatTime(isoString: string | null): string {
@@ -50,7 +52,7 @@ function flyToStation(map: L.Map, station: Station) {
   map.flyTo([station.lat, station.lng], 16, { duration: 1.2 })
 }
 
-export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceStatsBarProps) {
+export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageCookies }: PriceStatsBarProps) {
   const stats = useMapStats(stations)
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -129,23 +131,36 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceSt
         />
         <div className="w-px h-8 bg-gray-200" />
       </div>
-      {updatedTime && (
-        <div className="relative flex items-center justify-center pb-1">
-          <span className="text-[15px] text-black-400">Mise à jour: {updatedTime}</span>
-          <button
-            onClick={onRefresh}
-            className="p-1 text-black-400 active:text-gray-600 transition-transform"
-            aria-label="Rafraîchir"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M3 21v-5h5"/>
-            </svg>
-          </button>
-        </div>
-      )}
+      <div className="relative flex items-center justify-center pb-1 gap-3">
+        {updatedTime && (
+          <>
+            <span className="text-[15px] text-black-400">Mise à jour: {updatedTime}</span>
+            <button
+              onClick={onRefresh}
+              className="p-1 text-black-400 active:text-gray-600 transition-transform"
+              aria-label="Rafraîchir"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M3 21v-5h5"/>
+              </svg>
+            </button>
+          </>
+        )}
+        {ADS_ENABLED && (
+          <>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={onManageCookies}
+              className="text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Cookies
+            </button>
+          </>
+        )}
+      </div>
     </div>
   )
 }
