@@ -212,14 +212,14 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
           runPositionLoop()
 
           if (isExpanding && card) {
-            const closeOnOutside = (e: MouseEvent) => {
+            const closeOnOutside = (e: PointerEvent) => {
               if (!card.contains(e.target as Node)) {
                 card.classList.remove('expanded')
                 runPositionLoop()
-                document.removeEventListener('click', closeOnOutside, true)
+                document.removeEventListener('pointerdown', closeOnOutside, true)
               }
             }
-            setTimeout(() => document.addEventListener('click', closeOnOutside, true), 0)
+            setTimeout(() => document.addEventListener('pointerdown', closeOnOutside, true), 0)
           }
         })
 

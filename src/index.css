@@ -129,6 +129,7 @@ html, body, #root {
 
 .station-card.expanded .station-card-details-inner {
   padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .station-card.expanded .station-card-price {
