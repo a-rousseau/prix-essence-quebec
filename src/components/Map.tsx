@@ -54,6 +54,8 @@ const CLUSTER_GROUP_OPTIONS: L.MarkerClusterGroupOptions = {
   disableClusteringAtZoom: 14,
 }
 
+const EXPECTED_CARD_HEIGHT = 345 // px — expected expanded station card height for flyTo pre-offset
+
 const PRICE_COLORS = {
   low:  '#16a34a',
   mid:  '#f59e0b',
@@ -183,7 +185,19 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
           if (isExpanding) {
             for (const t of tooltipEls) t.style.zIndex = ''
             el.style.zIndex = '1000'
-            map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 0.8 })
+            // Pre-offset flyTo so the marker lands EXPECTED_CARD_HEIGHT/2 above viewport center
+            const targetZoom = Math.max(map.getZoom(), 14)
+            const projected = map.project([s.lat, s.lng], targetZoom)
+            const offsetLatLng = map.unproject(projected.subtract([0, EXPECTED_CARD_HEIGHT / 2]), targetZoom)
+            map.flyTo(offsetLatLng, targetZoom, { duration: 0.8 })
+            // After flyTo, correct for actual vs expected card height
+            map.once('moveend', () => {
+              if (!card?.classList.contains('expanded')) return
+              const actualHeight = card.getBoundingClientRect().height
+              const correction = Math.round((actualHeight - EXPECTED_CARD_HEIGHT) / 2)
+              if (correction !== 0) map.panBy([0, -correction], { animate: true, duration: 0.3 })
+              runPositionLoop()
+            })
             const ins = el.querySelector<HTMLElement>('.adsbygoogle')
             if (ins && !ins.dataset.adsbygoogleStatus) {
               const w = window as unknown as { adsbygoogle: object[] }
