@@ -11,6 +11,9 @@ const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
 export default function App() {
   const { stations, loading, error, lastUpdated, refresh } = useStations()
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
+  const [dismissedError, setDismissedError] = useState<string | null>(null)
+
+  const visibleError = error !== dismissedError ? error : null
 
   const handleMapReady = useCallback((map: L.Map) => {
     setMapInstance(map)
@@ -20,9 +23,16 @@ export default function App() {
     <div className="h-dvh w-screen overflow-hidden relative">
       {loading && <LoadingSpinner />}
 
-      {error && (
-        <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg" style={ERROR_STYLE}>
-          <strong>Erreur:</strong> {error}
+      {visibleError && (
+        <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg flex items-start gap-3" style={ERROR_STYLE}>
+          <span className="flex-1"><strong>Erreur:</strong> {visibleError}</span>
+          <button
+            onClick={() => setDismissedError(visibleError)}
+            className="shrink-0 text-red-400 hover:text-red-600 transition-colors leading-none mt-0.5"
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
         </div>
       )}
 

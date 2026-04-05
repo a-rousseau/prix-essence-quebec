@@ -111,14 +111,16 @@ function createStationCard(s: Station): string {
           <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">
             Obtenir l'itinéraire
           </a>
-          <div class="station-card-sep"></div>
-          <ins class="adsbygoogle"
-            style="display:block;width:250px"
-            data-ad-client="ca-pub-7169608195886569"
-            data-ad-slot="3373913657"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <div class="station-card-sep"></div>
+          <div class="station-card-ad-container">
+            <div class="station-card-sep"></div>
+            <ins class="adsbygoogle"
+              style="display:block;width:250px"
+              data-ad-client="ca-pub-7169608195886569"
+              data-ad-slot="3373913657"
+              data-ad-format="auto"
+              data-full-width-responsive="true"></ins>
+            <div class="station-card-sep"></div>
+          </div>
         </div>
       </div>
     </div>`
@@ -252,17 +254,28 @@ function LocateControl() {
   const markerRef = useRef<L.Marker | null>(null)
 
   useEffect(() => {
-    function showGeoError(message: string, timeout: number = 4000) {
+    function showGeoError(html: string, timeout: number = 4000) {
       const container = map.getContainer()
       const notice = document.createElement('div')
       notice.style.cssText =
         'position:absolute;top:1rem;left:1rem;right:1rem;z-index:2000;' +
         'background:#fef2f2;border:1px solid #fecaca;border-radius:0.5rem;' +
         'padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);' +
-        'line-height:1.5;max-height:150px;overflow:auto;'
-      notice.textContent = message
+        'line-height:1.5;max-height:150px;overflow:auto;' +
+        'display:flex;align-items:flex-start;gap:0.75rem;'
+      const text = document.createElement('div')
+      text.style.cssText = 'flex:1;'
+      text.innerHTML = html
+      const closeBtn = document.createElement('button')
+      closeBtn.textContent = '✕'
+      closeBtn.style.cssText =
+        'flex-shrink:0;background:none;border:none;cursor:pointer;' +
+        'color:#f87171;font-size:1rem;line-height:1;padding:0;margin-top:1px;'
+      notice.appendChild(text)
+      notice.appendChild(closeBtn)
       container.appendChild(notice)
-      setTimeout(() => notice.remove(), timeout)
+      const timer = setTimeout(() => notice.remove(), timeout)
+      closeBtn.addEventListener('click', () => { notice.remove(); clearTimeout(timer) })
     }
 
     function locate(flyTo: boolean) {
@@ -280,15 +293,20 @@ function LocateControl() {
         (err) => {
           if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
             showGeoError(
-              'Localisation refusée. Sur iOS: Réglages → Général → Réinitialiser → Réinitialiser localisation et confidentialité. Sur Android: Réglages → Applications → Permissions → Localisation.',
-              8000
+              '<p><strong>Localisation refusée</strong></p><p>Pour réactiver la localisation:</p>' +
+              '<ul style="margin:0.4rem 0 0;padding-left:1.2rem;">' +
+              '<li><strong>Sur iOS&nbsp;:</strong> Réglages → Confidentialité → Service de localisation</li>' +
+              '<li><strong>Sur Android&nbsp;:</strong> Réglages → Applications → Permissions → Localisation</li>' +
+              '</ul>'+
+              '<p class="mt-2>Et si ça ne fonctionne toujours pas, veuillez réinitialiser toutes vos préférences de confidentialité et de localisation.</p>',
+              10000
             )
           } else if (err.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-            showGeoError('Position introuvable. Réessayez dans un moment.')
+            showGeoError('<strong>Position introuvable.</strong> Réessayez dans un moment.')
           } else if (err.code === GeolocationPositionError.TIMEOUT) {
-            showGeoError('La demande de localisation a expiré.')
+            showGeoError('<strong>Délai dépassé.</strong> La demande de localisation a expiré.')
           } else {
-            showGeoError('Erreur de géolocalisation.')
+            showGeoError('<strong>Erreur de géolocalisation.</strong>')
           }
         },
         { enableHighAccuracy: true, timeout: 10000 }

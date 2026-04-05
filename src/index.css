@@ -149,6 +149,14 @@ html, body, #root {
   margin-bottom: 8px;
 }
 
+.station-card-ad-container {
+  display: none;
+}
+
+.station-card-ad-container:has(.adsbygoogle[data-ad-status="filled"]) {
+  display: block;
+}
+
 .station-card-header {
   display: flex;
   align-items: flex-start;
@@ -341,3 +349,4 @@ html, body, #root {
 .leaflet-tooltip-right:before {
   display: none;
 }
+
