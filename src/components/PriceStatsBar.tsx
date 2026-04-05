@@ -34,6 +34,7 @@ interface PriceStatsBarProps {
   map: L.Map | null
   onRefresh: () => void
   onManageCookies: () => void
+  onTrademarks: () => void
 }
 
 function formatTime(isoString: string | null): string {
@@ -52,7 +53,7 @@ function flyToStation(map: L.Map, station: Station) {
   map.flyTo([station.lat, station.lng], 16, { duration: 1.2 })
 }
 
-export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageCookies }: PriceStatsBarProps) {
+export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageCookies, onTrademarks }: PriceStatsBarProps) {
   const stats = useMapStats(stations)
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -107,7 +108,7 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageC
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg"
+      className="bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg"
       style={SAFE_AREA_PADDING}
     >
       <div className="flex items-center justify-around px-4 pt-2 pb-1">
@@ -149,6 +150,15 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, onManageC
             </button>
           </>
         )}
+        <>
+          <span className="text-gray-300">|</span>
+          <button
+            onClick={onTrademarks}
+            className="text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            Marques & logos
+          </button>
+        </>
         {ADS_ENABLED && (
           <>
             <span className="text-gray-300">|</span>
