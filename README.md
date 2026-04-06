@@ -96,8 +96,10 @@ npm run build
 ```
 
 ## Déploiement
-
-Le projet se déploie automatiquement sur Netlify à chaque push sur `main`. La configuration se trouve dans `netlify.toml`.
+Assurez-vous d'avoir installer le [Netlify CLI](https://docs.netlify.com/cli/get-started/)
+```bash
+netflify deploy --prod
+```
 
 ## Données et attributions
 
