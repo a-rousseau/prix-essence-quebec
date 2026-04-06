@@ -7,7 +7,7 @@ deno.lock
 
 # Playwright MCP
 .playwright-mcp
-
+.DS_Store
 */.DS_Store
 */*/.DS_Store
 */*/*/.DS_Store
