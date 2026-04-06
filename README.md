@@ -30,10 +30,6 @@ Carte interactive des prix d'essence en temps réel pour la province de Québec.
 
 ```
 prix-essence-quebec/
-├── netlify/
-│   └── functions/
-│       └── stations.mts     # Fonction serverless — scrape et parse le fichier Excel
-│                            # de la Régie, expose /api/stations
 ├── src/
 │   ├── components/
 │   │   ├── Map.tsx          # Carte Leaflet, marqueurs, tooltips, séparation
@@ -41,23 +37,30 @@ prix-essence-quebec/
 │   │   ├── SearchBar.tsx
 │   │   └── ...
 │   ├── hooks/
-│   │   └── useStations.ts   # Fetch + cache des données stations
+│   │   └── useStations.ts   # Fetch, parse et cache des données GeoJSON
 │   ├── lib/
 │   │   ├── brandLogos.ts    # Association bannière → logo
 │   │   ├── clusterIcon.ts   # Icône personnalisée pour les clusters
-│   │   └── cache.ts
+│   │   └── cache.ts         # Cache localStorage avec TTL
 │   └── index.css
-├── netlify.toml             # Config build, headers HTTP, cache
+├── netlify.toml             # Config build, headers HTTP, cache statique
 └── vite.config.ts
 ```
 
 ## Données
 
-La fonction serverless `/api/stations` :
-1. Télécharge la page de la Régie de l'énergie du Québec
-2. Extrait l'URL du fichier Excel (format `stations-YYYYMMDDHHMMSS.xlsx`)
-3. Parse le fichier avec `xlsx` et retourne les stations en JSON
-4. Le résultat est mis en cache 30 minutes (Cache-Control)
+Les données sont récupérées directement depuis le GeoJSON public de la Régie :
+
+```
+https://regieessencequebec.ca/stations.geojson.gz
+```
+
+Le hook `useStations.ts` :
+1. Vérifie d'abord le cache `localStorage` (évite un fetch inutile)
+2. Télécharge le fichier GeoJSON compressé — le navigateur le décompresse automatiquement via `Content-Encoding: gzip`
+3. Parse les features GeoJSON (coordonnées, prix par type de carburant, métadonnées)
+4. Si le champ `metadata.generated_at` n'a pas changé, réutilise les données déjà parsées et prolonge le TTL du cache
+5. Met en cache le résultat dans `localStorage`
 
 ## Démarrage local
 
