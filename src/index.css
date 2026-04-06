@@ -54,6 +54,28 @@ html, body, #root {
   display: none !important;
 }
 
+/* Arrow is drawn as an SVG connector by JS — suppress Leaflet's default */
+.station-tooltip:after {
+  display: none !important;
+}
+
+/* Wrapper that JS transforms for collision avoidance */
+.tooltip-inner {
+  position: relative;
+  display: block;
+}
+
+/* SVG connector drawn by separateTooltips() */
+.tooltip-connector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  pointer-events: none;
+}
+
 /* ── Unified station card (compact → expandable) ── */
 .station-card {
   background: white;
@@ -153,6 +175,7 @@ html, body, #root {
 .station-card-ad-container {
   display: none;
 }
+
 
 .station-card-ad-container:has(.adsbygoogle[data-ad-status="filled"]) {
   display: block;

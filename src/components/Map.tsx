@@ -84,7 +84,7 @@ function createStationCard(s: Station): string {
   const displayName = esc(s.banniere || s.nom)
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
   const badgeHtml = `<img src="${esc(getBrandLogo(s.banniere))}" class="brand-logo" alt="${displayName}" width="28" height="28">`
-  return `
+  return `<div class="tooltip-inner">
     <div class="station-card">
 
       <div class="station-card-compact">
@@ -120,7 +120,8 @@ function createStationCard(s: Station): string {
           </div>
         </div>
       </div>
-    </div>`
+    </div>
+  </div>`
 }
 
 function ClusterLayer({ stations }: ClusterLayerProps) {
@@ -145,6 +146,140 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
 
     const clusterGroup = L.markerClusterGroup(CLUSTER_GROUP_OPTIONS)
     const tooltipEls = tooltipElsRef.current
+    const markers: L.CircleMarker[] = []
+
+    // ── Collision-resolution for overlapping tooltips ─────────────────────
+    const BASE_HALF_W = 12   // px — half-width of the triangle base on the card
+    // Gap between card bottom and marker centre (matches TOOLTIP_OPTIONS offset[1])
+
+
+    // rAF-debounce so rapid events (tooltipopen storm during zoom) coalesce
+    let rafId = 0
+    function scheduleSeparate() {
+      if (rafId) return
+      rafId = requestAnimationFrame(() => { rafId = 0; separateTooltips() })
+    }
+
+    function separateTooltips() {
+      const PAD = 8
+      const mapRect = map.getContainer().getBoundingClientRect()
+
+      interface Item {
+        marker: L.CircleMarker
+        inner:  HTMLElement
+        rect:   DOMRect            // natural (pre-transform) bounding rect
+        markerPx: L.Point          // marker pixel coords in container
+        offsetX: number
+        offsetY: number
+      }
+
+      // 1. Reset previous transforms so we read natural (Leaflet-placed) positions
+      for (const m of markers) {
+        const inner = m.getTooltip()?.getElement()?.querySelector<HTMLElement>('.tooltip-inner')
+        if (!inner) continue
+        inner.style.transform = ''
+      }
+
+      // 2. Collect visible items
+      const items: Item[] = []
+      for (const m of markers) {
+        const inner = m.getTooltip()?.getElement()?.querySelector<HTMLElement>('.tooltip-inner')
+        if (!inner) continue
+        const rect = inner.getBoundingClientRect()
+        if (rect.width === 0 || rect.height === 0) continue // hidden inside a cluster
+        const markerPx = map.latLngToContainerPoint(m.getLatLng())
+        items.push({ marker: m, inner, rect, markerPx, offsetX: 0, offsetY: 0 })
+      }
+
+      // 3. Iterative push-apart — marker-direction-aware, horizontal-first
+      //    Each card is pushed toward its own marker's side so connectors stay short.
+      //    Vertical push is only a last resort (avoids placing a card over its marker).
+      const MAX_OFFSET = 70 // px — hard ceiling on displacement from natural position
+      for (let iter = 0; iter < 40; iter++) {
+        let moved = false
+        for (let i = 0; i < items.length; i++) {
+          for (let j = i + 1; j < items.length; j++) {
+            const a = items[i], b = items[j]
+            const ax1 = a.rect.left - mapRect.left + a.offsetX
+            const ax2 = ax1 + a.rect.width  + PAD
+            const ay1 = a.rect.top  - mapRect.top  + a.offsetY
+            const ay2 = ay1 + a.rect.height + PAD
+            const bx1 = b.rect.left - mapRect.left + b.offsetX
+            const bx2 = bx1 + b.rect.width  + PAD
+            const by1 = b.rect.top  - mapRect.top  + b.offsetY
+            const by2 = by1 + b.rect.height + PAD
+            const ox = Math.min(ax2, bx2) - Math.max(ax1, bx1)
+            const oy = Math.min(ay2, by2) - Math.max(ay1, by1)
+            if (ox > 0 && oy > 0) {
+              // Determine push direction from marker positions:
+              //   push A toward A's marker's side, B toward B's marker's side.
+              // Tiebreaker (same X): use array index so the result is stable.
+              const mdx = a.markerPx.x - b.markerPx.x
+              const dirA = mdx !== 0 ? (mdx > 0 ? 1 : -1) : (i < j ? -1 : 1)
+
+              // Remaining budget for each card in its push direction
+              const aUsed = Math.max(0,  dirA * a.offsetX)
+              const aRoom = Math.max(0, MAX_OFFSET - aUsed)
+              const bUsed = Math.max(0, -dirA * b.offsetX)
+              const bRoom = Math.max(0, MAX_OFFSET - bUsed)
+              const total = aRoom + bRoom
+
+              if (total > 0.1) {
+                // Horizontal push — budget-proportional split
+                a.offsetX += dirA * ox * (aRoom / total)
+                b.offsetX -= dirA * ox * (bRoom / total)
+              } else {
+                // Horizontal budget exhausted — push both upward as last resort
+                a.offsetY = Math.max(-MAX_OFFSET, a.offsetY - oy / 2)
+                b.offsetY = Math.max(-MAX_OFFSET, b.offsetY - oy / 2)
+              }
+              moved = true
+            }
+          }
+        }
+        if (!moved) break
+      }
+
+      // Hard-clamp as safety net
+      for (const t of items) {
+        t.offsetX = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, t.offsetX))
+        t.offsetY = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, t.offsetY))
+      }
+
+      // 4. Apply transform + update SVG connector for every visible item
+      for (const t of items) {
+        const dx = Math.round(t.offsetX)
+        const dy = Math.round(t.offsetY)
+        t.inner.style.transform = dx || dy ? `translate(${dx}px,${dy}px)` : ''
+
+        // ── SVG connector ──────────────────────────────────────────────────
+        // Coordinate system: origin = top-left of .tooltip-inner (pre-transform).
+        // After transform(dx,dy) the card occupies (0,0)→(W,H) in this space.
+        // The marker screen position converts to local coords as:
+        //   localX = markerPx.x - naturalLeft - dx
+        //   localY = markerPx.y - naturalTop  - dy
+        const naturalLeft = t.rect.left - mapRect.left
+        const naturalTop  = t.rect.top  - mapRect.top
+        const tipX = t.markerPx.x - naturalLeft - dx
+        const tipY = t.markerPx.y - naturalTop  - dy
+
+        const cardW = t.rect.width
+        const cardH = t.rect.height
+        // Triangle base: centred at the bottom of the card
+        const baseL = cardW / 2 - BASE_HALF_W
+        const baseR = cardW / 2 + BASE_HALF_W
+
+        let svg = t.inner.querySelector<SVGSVGElement>('.tooltip-connector')
+        if (!svg) {
+          svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg') as SVGSVGElement
+          svg.setAttribute('class', 'tooltip-connector')
+          t.inner.appendChild(svg)
+        }
+        svg.innerHTML =
+          `<polygon points="${baseL},${cardH} ${baseR},${cardH} ${tipX},${tipY}" ` +
+          `fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>`
+      }
+    }
 
     for (const s of stations) {
       const marker = L.circleMarker([s.lat, s.lng], {
@@ -155,6 +290,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
       marker.bindTooltip(() => createStationCard(s), TOOLTIP_OPTIONS)
 
       marker.on('tooltipopen', (e) => {
+        scheduleSeparate()   // draw SVG connector as soon as tooltip is in the DOM
         const el = e.tooltip.getElement()
         if (!el) return
 
@@ -225,13 +361,21 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
         })
       })
 
+      markers.push(marker)
       clusterGroup.addLayer(marker)
     }
 
     map.addLayer(clusterGroup)
+    map.on('moveend', scheduleSeparate)
+    map.on('zoomend', scheduleSeparate)
+    clusterGroup.on('animationend', scheduleSeparate)
 
     return () => {
+      cancelAnimationFrame(rafId)
       map.removeLayer(clusterGroup)
+      map.off('moveend', scheduleSeparate)
+      map.off('zoomend', scheduleSeparate)
+      clusterGroup.off('animationend', scheduleSeparate)
       tooltipEls.clear()
     }
   }, [stations, map])
