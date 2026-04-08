@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type L from 'leaflet'
 import { Map } from './components/Map'
 import { PriceStatsBar } from './components/PriceStatsBar'
@@ -8,8 +8,12 @@ import { ConsentBanner } from './components/ConsentBanner'
 import { TrademarkNotice } from './components/TrademarkNotice'
 import { PrivacyNotice } from './components/PrivacyNotice'
 import { HamburgerMenu } from './components/HamburgerMenu'
+import { FilterButton } from './components/FilterButton'
+import { FilterPanel } from './components/FilterPanel'
 import { getAdConsent, loadAdSense, ADS_ENABLED, clearAdConsent } from './lib/adConsent'
 import { useStations } from './hooks/useStations'
+import { filterStations } from './lib/filterUtils'
+import type { FilterState } from './types/filter'
 
 const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
 const TOP_CONTROLS_STYLE = {
@@ -30,12 +34,34 @@ export default function App() {
   const [showMenu, setShowMenu] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showTrademark, setShowTrademark] = useState(false)
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  const [filterState, setFilterState] = useState<FilterState>({
+    fuelTypes: { regulier: true, super: true, diesel: true },
+    companies: [],
+    regions: [],
+    showFavoritesOnly: false,
+  })
+  const [filteredStations, setFilteredStations] = useState(stations)
 
   const visibleError = error !== dismissedError ? error : null
 
   const handleMapReady = useCallback((map: L.Map) => {
     setMapInstance(map)
   }, [])
+
+  useEffect(() => {
+    if (stations.length === 0) return
+
+    const availableCompanies = Array.from(new Set(stations.map(station => station.banniere).filter(Boolean))).sort()
+
+    if (filterState.companies.length === 0) {
+      setFilterState(prev => ({ ...prev, companies: availableCompanies }))
+    }
+  }, [stations, filterState.companies.length])
+
+  useEffect(() => {
+    setFilteredStations(filterStations(stations, filterState))
+  }, [stations, filterState])
 
   function handleConsent(accepted: boolean) {
     if (accepted) loadAdSense()
@@ -60,21 +86,31 @@ export default function App() {
           </div>
         )}
 
-        <Map stations={stations} onMapReady={handleMapReady} />
+        <Map stations={filteredStations} onMapReady={handleMapReady} />
 
-        <div className="absolute z-[1001] flex flex-row gap-2" style={TOP_CONTROLS_STYLE}>
-          <button
-            onClick={() => setShowMenu(true)}
-            className="w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-gray-700 hover:bg-white transition-colors shrink-0"
-            aria-label="Menu"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <line x1="3" y1="12" x2="21" y2="12"/>
-              <line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-          </button>
-          <SearchBar map={mapInstance} />
+        <div className="absolute z-[1001] flex flex-col gap-3" style={TOP_CONTROLS_STYLE}>
+          <div className="flex flex-row gap-2">
+            <button
+              onClick={() => setShowMenu(true)}
+              className="w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-gray-700 hover:bg-white transition-colors shrink-0"
+              aria-label="Menu"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <SearchBar map={mapInstance} />
+            <FilterButton onClick={() => setFilterPanelOpen(open => !open)} isActive={filterPanelOpen} />
+          </div>
+
+          <FilterPanel
+            open={filterPanelOpen}
+            filterState={filterState}
+            onFilterChange={setFilterState}
+            stations={stations}
+          />
         </div>
       </div>
 
