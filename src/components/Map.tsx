@@ -6,6 +6,8 @@ import type { Station } from '../types/station'
 import { getBrandLogo } from '../lib/brandLogos'
 import { createClusterIcon } from '../lib/clusterIcon'
 
+const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_PUBLISHER_ID ?? ''
+
 interface ClusterLayerProps {
   stations: Station[]
 }
@@ -84,6 +86,19 @@ function createStationCard(s: Station): string {
   const displayName = esc(s.banniere || s.nom)
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
   const badgeHtml = `<img src="${esc(getBrandLogo(s.banniere))}" class="brand-logo" alt="${displayName}" width="28" height="28">`
+  const adSlotHtml = ADSENSE_CLIENT.trim()
+    ? `<div class="station-card-ad-container">
+         <div class="station-card-sep"></div>
+         <ins class="adsbygoogle"
+           style="display:block;width:250px"
+           data-ad-client="${esc(ADSENSE_CLIENT)}"
+           data-ad-slot="3373913657"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+         <div class="station-card-sep"></div>
+       </div>`
+    : ''
+
   return `<div class="tooltip-inner">
     <div class="station-card">
 
@@ -108,16 +123,7 @@ function createStationCard(s: Station): string {
           <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">
             Obtenir l'itinéraire
           </a>
-          <div class="station-card-ad-container">
-            <div class="station-card-sep"></div>
-            <ins class="adsbygoogle"
-              style="display:block;width:250px"
-              data-ad-client="ca-pub-7169608195886569"
-              data-ad-slot="3373913657"
-              data-ad-format="auto"
-              data-full-width-responsive="true"></ins>
-            <div class="station-card-sep"></div>
-          </div>
+          ${adSlotHtml}
         </div>
       </div>
     </div>

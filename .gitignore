@@ -5,6 +5,9 @@ deno.lock
 # Local Netlify folder
 .netlify
 
+# Local environment variables
+.env
+
 # Playwright MCP
 .playwright-mcp
 .DS_Store

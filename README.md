@@ -75,6 +75,22 @@ Le hook `useStations.ts` :
 npm install
 ```
 
+### Variables d'environnement
+
+Copiez le modèle local et configurez votre identifiant AdSense :
+
+```bash
+cp .env.example .env
+```
+
+Ensuite, éditez le fichier `.env` :
+
+```env
+VITE_ADSENSE_PUBLISHER_ID=ca-pub-xxxxxxxxxxxxxxxx
+```
+
+Le fichier `.env` est ignoré par git pour protéger les informations sensibles.
+
 ### Développement (avec la fonction serverless)
 
 ```bash
