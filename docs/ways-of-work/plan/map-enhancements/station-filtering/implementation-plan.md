@@ -1,8 +1,8 @@
 ---
 goal: Implement Station Filtering, Price Analytics, and AdSense Configuration Hiding
-version: 1.3
+version: 1.3.1
 date_created: 2026-04-07
-last_updated: 2026-04-07
+last_updated: 2026-04-08
 owner:
 status: In progress
 tags: feature, frontend, filtering, security, UI/UX, analytics, regional-filtering, interactive-workflow
@@ -155,6 +155,18 @@ This implementation plan outlines the addition of filtering functionality to the
 | TASK-033 | Test favorites functionality persistence across sessions | |  |
 | TASK-034 | Test AdSense configuration loading with environment variables | |  |
 | TASK-035 | Validate that .env is properly ignored by git | |  |
+
+### Implementation Phase 8: User Review and Optimization
+
+- GOAL-008: Have user test changes in browser, then agent reviews and optimizes
+
+| Task | Description | Completed | Date |
+|------|-------------|-----------|------|
+| TASK-036 | Start dev server: run `npm run dev:all` and wait for local server URL | |  |
+| TASK-037 | Notify user: "Dev server is running. Please test all features and changes. Reply when you're done." | |  |
+| TASK-038 | Review all user changes, test functionality, check Console for errors, identify optimization opportunities | |  |
+| TASK-039 | Optimize code: improve performance, fix any issues found, ensure code quality | |  |
+| TASK-040 | Notify user: "Review and optimization complete. Ready for production." | |  |
 
 ## 2.1 Component Specifications
 
@@ -363,10 +375,12 @@ Based on analysis of https://gazquebec.ca, the following features are recommende
 | Phase 5 | Price Statistics Display | Not Started | 0 | 5 | - |
 | Phase 6 | Favorites & Price Trends | Not Started | 0 | 5 | - |
 | Phase 7 | Testing & Documentation | Not Started | 0 | 5 | - |
+| Phase 8 | User Review and Optimization | Not Started | 0 | 5 | - |
 
 ### Current Checkpoints
 
-- **v1.3-start**: Initial release with full specification (this checkpoint)
+- **v1.3.1-current**: Latest version with Phase 8 User Review (this checkpoint)
+- **v1.3-start**: Initial release with Phases 1-7
 - **v1.3-phase1-complete**: After completing Core Filtering Logic (Phase 1)
 - **v1.3-foundation-complete**: After completing Phases 1-3 (basic filtering + security)
 - **v1.3-analytics-complete**: After completing Phases 1-5 (with price stats)
@@ -452,7 +466,8 @@ Example:
 - **After Phase 2**: Component integration test, check UI positioning, then Phase 3 can be done in parallel
 - **After Phase 3**: Security verification (no AdSense ID in bundle), then Phase 4
 - **After Phase 4+**: Run full integration tests before proceeding to next phase
-- **After Phase 7**: Code review, perform TEST-001 through TEST-009, prepare for production deploy
+- **After Phase 7**: Proceed to Phase 8: Start `npm run dev:all` and wait for user to test changes
+- **During Phase 8**: Review code, test functionality, optimize, then notify user when complete and ready for production
 
 ## 10. Related Specifications / Further Reading
 
