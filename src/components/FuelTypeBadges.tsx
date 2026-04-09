@@ -11,7 +11,7 @@ const fuelTypes = [
 
 export function FuelTypeBadges({ selectedFuelType, onSelect }: FuelTypeBadgesProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1">
       {fuelTypes.map(({ label, key }) => {
         const active = selectedFuelType === key
         return (

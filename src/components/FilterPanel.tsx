@@ -11,7 +11,7 @@ interface FilterPanelProps {
 
 export function FilterPanel({ filterState, onFilterChange, stations }: FilterPanelProps) {
   const availableBrands = Array.from(new Set(stations.map(s => s.banniere).filter(Boolean))).sort()
-  const selectedBrands = filterState.companies.length > 0 ? filterState.companies : availableBrands
+  const selectedBrands = filterState.companies
 
   function handleSelectFuel(fuelType: 'regulier' | 'super' | 'diesel' | null) {
     onFilterChange({
@@ -26,7 +26,7 @@ export function FilterPanel({ filterState, onFilterChange, stations }: FilterPan
 
   return (
     <div className="w-full">
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-row gap-2">
         <div>
           <FuelTypeBadges selectedFuelType={filterState.selectedFuelType} onSelect={handleSelectFuel} />
         </div>

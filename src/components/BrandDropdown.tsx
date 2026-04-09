@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 
 interface BrandDropdownProps {
   selectedBrands: string[]
@@ -10,7 +11,7 @@ export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange 
   const [open, setOpen] = useState(false)
 
   const allSelected = selectedBrands.length === availableBrands.length && availableBrands.length > 0
-  const label = allSelected ? 'Toutes les bannières' : `${selectedBrands.length} sélectionnée${selectedBrands.length === 1 ? '' : 's'}`
+  const label = allSelected ? 'Marques' : `Marques(${selectedBrands.length})`
 
   function toggleBrand(brand: string) {
     if (selectedBrands.includes(brand)) {
@@ -33,15 +34,15 @@ export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange 
       <button
         type="button"
         onClick={() => setOpen(open => !open)}
-        className="w-full text-left px-4 py-1.5 rounded-md bg-white border border-gray-200 shadow-map flex items-center justify-between text-sm text-gray-700 hover:bg-gray-50 transition"
+        className="w-full text-right px-4 py-1.5 rounded-md bg-white border border-gray-200 shadow-map flex items-center justify-between text-sm text-gray-700 hover:bg-gray-50 transition"
       >
         <span>{label}</span>
-        <span className="text-gray-400">▾</span>
+        <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="absolute z-20 mt-2 w-full rounded-md border border-gray-400 bg-white shadow-map overflow-hidden">
-          <div className="max-h-52 overflow-y-auto p-3 space-y-2">
+        <div className="absolute flex flex-col z-20 mt-2 right-0 w-50 rounded-md border border-gray-400 bg-white shadow-map overflow-hidden" style={{ height: `calc(100vh - 220px)` }}>
+          <div className="overflow-y-auto p-3 space-y-2">
             {availableBrands.length === 0 ? (
               <div className="text-sm text-gray-500">Aucune bannière disponible</div>
             ) : (

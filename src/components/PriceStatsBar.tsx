@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { RefreshCw } from 'lucide-react'
 import L from 'leaflet'
 import type { Station } from '../types/station'
 import { useMapStats } from '../hooks/useMapStats'
@@ -81,12 +82,14 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, selectedF
     let minStation: Station | null = null
     for (const s of stations) {
       if (!visibleBounds.contains([s.lat, s.lng])) continue
-      const p = s.prixRegulier
+      const p = selectedFuelType === 'super' ? s.prixSuper :
+                selectedFuelType === 'diesel' ? s.prixDiesel :
+                s.prixRegulier
       if (p === null) continue
       if (min === null || p < min) { min = p; minStation = s }
     }
     return { visibleLowest: min, visibleLowestStation: minStation }
-  }, [stations, visibleBounds])
+  }, [stations, visibleBounds, selectedFuelType])
 
   const { lowestStation, highestStation } = stats
   const lowestDisplay = stats.lowest !== null ? `${stats.lowest}¢` : '—'
@@ -139,12 +142,7 @@ export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, selectedF
               className="p-1 text-black-400 active:text-gray-600 transition-transform"
               aria-label="Rafraîchir"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M3 21v-5h5"/>
-              </svg>
+              <RefreshCw size={18} />
             </button>
           </>
         )}

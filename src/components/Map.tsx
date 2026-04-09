@@ -27,11 +27,7 @@ const LOCATION_ICON = L.divIcon({
   iconAnchor: [12, 12],
 })
 
-const LOCATE_BTN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="3"/>
-  <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-  <circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/>
-</svg>`
+const LOCATE_BTN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" x2="18" y1="12" y2="12"></line><line x1="6" x2="2" y1="12" y2="12"></line><line x1="12" x2="12" y1="6" y2="2"></line><line x1="12" x2="12" y1="22" y2="18"></line></svg>`
 
 const CIRCLE_MARKER_BASE = {
   radius: 8,
@@ -142,9 +138,15 @@ function ClusterLayer({ stations, selectedFuelType }: ClusterLayerProps) {
   useEffect(() => {
     if (stations.length === 0) return
 
+    function getPrice(s: Station): number | null {
+      return selectedFuelType === 'super' ? s.prixSuper :
+             selectedFuelType === 'diesel' ? s.prixDiesel :
+             s.prixRegulier
+    }
+
     let lowest = Infinity, highest = -Infinity
     for (const s of stations) {
-      const p = s.prixRegulier
+      const p = getPrice(s)
       if (p === null) continue
       if (p < lowest) lowest = p
       if (p > highest) highest = p
@@ -295,7 +297,7 @@ function ClusterLayer({ stations, selectedFuelType }: ClusterLayerProps) {
     for (const s of stations) {
       const marker = L.circleMarker([s.lat, s.lng], {
         ...CIRCLE_MARKER_BASE,
-        fillColor: getPriceColor(s.prixRegulier, lowThreshold, highThreshold, hasRange),
+        fillColor: getPriceColor(getPrice(s), lowThreshold, highThreshold, hasRange),
       })
 
       marker.bindTooltip(() => createStationCard(s, selectedFuelType), TOOLTIP_OPTIONS)
@@ -488,7 +490,7 @@ function LocateControl() {
     // Auto-locate on load only in browser mode; standalone requires a user gesture
     if (!isStandalone()) locate(true)
 
-    const control = new L.Control({ position: 'topright' })
+    const control = new L.Control({ position: 'bottomright' })
 
     control.onAdd = () => {
       const btn = L.DomUtil.create('button', 'leaflet-control-locate')
@@ -542,7 +544,7 @@ export function Map({ stations, onMapReady, selectedFuelType }: MapProps) {
         attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> | Données: <a href='https://regieessencequebec.ca'>Régie de l'énergie du Québec</a>"
         maxZoom={19}
       />
-      <ZoomControl position="topright" />
+      <ZoomControl position="bottomright" />
       <MapController onMapReady={onMapReady} />
       <ClusterLayer stations={stations} selectedFuelType={selectedFuelType} />
       <LocateControl />

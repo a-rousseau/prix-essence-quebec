@@ -4,14 +4,10 @@ import type { FilterState } from '../types/filter'
 export function filterStations(stations: Station[], filterState: FilterState): Station[] {
   const selectedFuelType = filterState.selectedFuelType
 
-  const allowedCompanies = filterState.companies.length > 0
-    ? new Set(filterState.companies)
-    : null
+  const allowedCompanies = new Set(filterState.companies)
 
   return stations.filter(station => {
-    const companyMatches = allowedCompanies
-      ? allowedCompanies.has(station.banniere)
-      : true
+    const companyMatches = allowedCompanies.has(station.banniere)
 
     if (!companyMatches) return false
 

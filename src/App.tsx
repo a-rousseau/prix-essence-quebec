@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { Menu } from 'lucide-react'
 import type L from 'leaflet'
 import { Map } from './components/Map'
 import { PriceStatsBar } from './components/PriceStatsBar'
@@ -18,7 +19,7 @@ const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
 const TOP_CONTROLS_STYLE = {
   top: 'max(12px, env(safe-area-inset-top, 12px))',
   left: '12px',
-  width: 'max(320px, calc(100vw - 80px))',
+  width: 'calc(100vw - 24px)',
 }
 
 // Load AdSense immediately if consent was already given in a previous session
@@ -40,6 +41,7 @@ export default function App() {
     showFavoritesOnly: false,
   })
   const [filteredStations, setFilteredStations] = useState(stations)
+  const brandsInitializedRef = useRef(false)
 
   const visibleError = error !== dismissedError ? error : null
 
@@ -48,14 +50,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (stations.length === 0) return
-
-    const availableCompanies = Array.from(new Set(stations.map(station => station.banniere).filter(Boolean))).sort()
-
-    if (filterState.companies.length === 0) {
-      setFilterState(prev => ({ ...prev, companies: availableCompanies }))
-    }
-  }, [stations, filterState.companies.length])
+    if (stations.length === 0 || brandsInitializedRef.current) return
+    const availableCompanies = Array.from(new Set(stations.map(s => s.banniere).filter(Boolean))).sort()
+    brandsInitializedRef.current = true
+    setFilterState(prev => ({ ...prev, companies: availableCompanies }))
+  }, [stations])
 
   useEffect(() => {
     setFilteredStations(filterStations(stations, filterState))
@@ -93,11 +92,7 @@ export default function App() {
               className="w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-md shadow-md border border-gray-200 text-gray-700 hover:bg-white transition-colors shrink-0"
               aria-label="Menu"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
-              </svg>
+              <Menu size={20} />
             </button>
             <SearchBar map={mapInstance} />
           </div>
@@ -111,7 +106,7 @@ export default function App() {
       </div>
 
       {stations.length > 0 && (
-        <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} selectedFuelType={filterState.selectedFuelType} />
+        <PriceStatsBar stations={filteredStations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} selectedFuelType={filterState.selectedFuelType} />
       )}
 
       {showMenu && (
