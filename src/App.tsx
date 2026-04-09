@@ -8,7 +8,6 @@ import { ConsentBanner } from './components/ConsentBanner'
 import { TrademarkNotice } from './components/TrademarkNotice'
 import { PrivacyNotice } from './components/PrivacyNotice'
 import { HamburgerMenu } from './components/HamburgerMenu'
-import { FilterButton } from './components/FilterButton'
 import { FilterPanel } from './components/FilterPanel'
 import { getAdConsent, loadAdSense, ADS_ENABLED, clearAdConsent } from './lib/adConsent'
 import { useStations } from './hooks/useStations'
@@ -34,9 +33,8 @@ export default function App() {
   const [showMenu, setShowMenu] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showTrademark, setShowTrademark] = useState(false)
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
   const [filterState, setFilterState] = useState<FilterState>({
-    fuelTypes: { regulier: true, super: true, diesel: true },
+    selectedFuelType: 'regulier',
     companies: [],
     regions: [],
     showFavoritesOnly: false,
@@ -74,7 +72,7 @@ export default function App() {
         {loading && <LoadingSpinner />}
 
         {visibleError && (
-          <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 shadow-lg flex items-start gap-3" style={ERROR_STYLE}>
+          <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-md px-4 py-3 text-sm text-red-700 shadow-md flex items-start gap-3" style={ERROR_STYLE}>
             <span className="flex-1"><strong>Erreur:</strong> {visibleError}</span>
             <button
               onClick={() => setDismissedError(visibleError)}
@@ -86,13 +84,13 @@ export default function App() {
           </div>
         )}
 
-        <Map stations={filteredStations} onMapReady={handleMapReady} />
+        <Map stations={filteredStations} onMapReady={handleMapReady} selectedFuelType={filterState.selectedFuelType} />
 
         <div className="absolute z-[1001] flex flex-col gap-3" style={TOP_CONTROLS_STYLE}>
           <div className="flex flex-row gap-2">
             <button
               onClick={() => setShowMenu(true)}
-              className="w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-gray-700 hover:bg-white transition-colors shrink-0"
+              className="w-10 h-10 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-md shadow-md border border-gray-200 text-gray-700 hover:bg-white transition-colors shrink-0"
               aria-label="Menu"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -102,11 +100,9 @@ export default function App() {
               </svg>
             </button>
             <SearchBar map={mapInstance} />
-            <FilterButton onClick={() => setFilterPanelOpen(open => !open)} isActive={filterPanelOpen} />
           </div>
 
           <FilterPanel
-            open={filterPanelOpen}
             filterState={filterState}
             onFilterChange={setFilterState}
             stations={stations}
@@ -115,7 +111,7 @@ export default function App() {
       </div>
 
       {stations.length > 0 && (
-        <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} />
+        <PriceStatsBar stations={stations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} selectedFuelType={filterState.selectedFuelType} />
       )}
 
       {showMenu && (
