@@ -1,9 +1,5 @@
 export interface FilterState {
-  fuelTypes: {
-    regulier: boolean
-    super: boolean
-    diesel: boolean
-  }
+  selectedFuelType: 'regulier' | 'super' | 'diesel' | null
   companies: string[]
   regions: string[]
   showFavoritesOnly: boolean

@@ -2,13 +2,7 @@ import type { Station } from '../types/station'
 import type { FilterState } from '../types/filter'
 
 export function filterStations(stations: Station[], filterState: FilterState): Station[] {
-  const selectedFuelTypes = Object.entries(filterState.fuelTypes)
-    .filter(([, selected]) => selected)
-    .map(([key]) => key)
-
-  if (selectedFuelTypes.length === 0) {
-    return []
-  }
+  const selectedFuelType = filterState.selectedFuelType
 
   const allowedCompanies = filterState.companies.length > 0
     ? new Set(filterState.companies)
@@ -21,13 +15,14 @@ export function filterStations(stations: Station[], filterState: FilterState): S
 
     if (!companyMatches) return false
 
-    const hasFuelMatch = selectedFuelTypes.some(fuelType => {
-      if (fuelType === 'regulier') return station.prixRegulier !== null
-      if (fuelType === 'super') return station.prixSuper !== null
-      if (fuelType === 'diesel') return station.prixDiesel !== null
-      return false
-    })
+    // If no fuel type selected, show all stations
+    if (selectedFuelType === null) return station.prixRegulier !== null
 
-    return hasFuelMatch
+    // Check if station has the selected fuel type
+    if (selectedFuelType === 'regulier') return station.prixRegulier !== null
+    if (selectedFuelType === 'super') return station.prixSuper !== null
+    if (selectedFuelType === 'diesel') return station.prixDiesel !== null
+
+    return false
   })
 }

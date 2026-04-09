@@ -149,7 +149,7 @@ export function SearchBar({ map }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Rechercher une adresse..."
-          className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+          className="w-full pl-9 pr-8 py-2 rounded-md bg-white/95 backdrop-blur-sm border border-gray-200 shadow-map text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
           style={INPUT_STYLE}
         />
 
@@ -168,7 +168,7 @@ export function SearchBar({ map }: SearchBarProps) {
       </div>
 
       {open && (
-        <ul className="mt-1 bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+        <ul className="mt-1 bg-white/95 backdrop-blur-sm rounded-md border border-gray-200 shadow-map overflow-hidden">
           {results.map((r, i) => (
             <li key={`${r.lat},${r.lng}`}>
               <button

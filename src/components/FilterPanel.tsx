@@ -4,22 +4,19 @@ import { FuelTypeBadges } from './FuelTypeBadges'
 import { BrandDropdown } from './BrandDropdown'
 
 interface FilterPanelProps {
-  open: boolean
   filterState: FilterState
   onFilterChange: (filterState: FilterState) => void
   stations: Station[]
 }
 
-export function FilterPanel({ open, filterState, onFilterChange, stations }: FilterPanelProps) {
-  if (!open) return null
-
+export function FilterPanel({ filterState, onFilterChange, stations }: FilterPanelProps) {
   const availableBrands = Array.from(new Set(stations.map(s => s.banniere).filter(Boolean))).sort()
   const selectedBrands = filterState.companies.length > 0 ? filterState.companies : availableBrands
 
-  function handleToggleFuel(fuelType: 'regulier' | 'super' | 'diesel') {
+  function handleSelectFuel(fuelType: 'regulier' | 'super' | 'diesel' | null) {
     onFilterChange({
       ...filterState,
-      fuelTypes: { ...filterState.fuelTypes, [fuelType]: !filterState.fuelTypes[fuelType] },
+      selectedFuelType: fuelType,
     })
   }
 
@@ -28,15 +25,12 @@ export function FilterPanel({ open, filterState, onFilterChange, stations }: Fil
   }
 
   return (
-    <div className="w-full rounded-3xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-2xl p-4">
-      <div className="flex flex-col gap-4">
+    <div className="w-full">
+      <div className="flex flex-row gap-4">
         <div>
-          <div className="text-sm font-semibold text-gray-900 mb-2">Types de carburant</div>
-          <FuelTypeBadges filterState={filterState.fuelTypes} onToggle={handleToggleFuel} />
+          <FuelTypeBadges selectedFuelType={filterState.selectedFuelType} onSelect={handleSelectFuel} />
         </div>
-
         <div>
-          <div className="text-sm font-semibold text-gray-900 mb-2">Bannières</div>
           <BrandDropdown
             selectedBrands={selectedBrands}
             availableBrands={availableBrands}

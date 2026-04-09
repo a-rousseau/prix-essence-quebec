@@ -32,6 +32,7 @@ interface PriceStatsBarProps {
   lastUpdated: string | null
   map: L.Map | null
   onRefresh: () => void
+  selectedFuelType: 'regulier' | 'super' | 'diesel' | null
 }
 
 function formatTime(isoString: string | null): string {
@@ -50,8 +51,8 @@ function flyToStation(map: L.Map, station: Station) {
   map.flyTo([station.lat, station.lng], 16, { duration: 1.2 })
 }
 
-export function PriceStatsBar({ stations, lastUpdated, map, onRefresh }: PriceStatsBarProps) {
-  const stats = useMapStats(stations)
+export function PriceStatsBar({ stations, lastUpdated, map, onRefresh, selectedFuelType }: PriceStatsBarProps) {
+  const stats = useMapStats(stations, selectedFuelType)
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 

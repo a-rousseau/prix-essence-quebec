@@ -8,7 +8,7 @@ interface MapStats {
   highestStation: Station | null
 }
 
-export function useMapStats(stations: Station[]): MapStats {
+export function useMapStats(stations: Station[], selectedFuelType: 'regulier' | 'super' | 'diesel' | null): MapStats {
   return useMemo(() => {
     let lowest: number | null = null
     let highest: number | null = null
@@ -16,12 +16,15 @@ export function useMapStats(stations: Station[]): MapStats {
     let highestStation: Station | null = null
 
     for (const s of stations) {
-      const p = s.prixRegulier
+      const p = selectedFuelType === 'regulier' ? s.prixRegulier :
+                selectedFuelType === 'super' ? s.prixSuper :
+                selectedFuelType === 'diesel' ? s.prixDiesel :
+                s.prixRegulier // default to regular
       if (p === null) continue
       if (lowest === null || p < lowest) { lowest = p; lowestStation = s }
       if (highest === null || p > highest) { highest = p; highestStation = s }
     }
 
     return { lowest, highest, lowestStation, highestStation }
-  }, [stations])
+  }, [stations, selectedFuelType])
 }

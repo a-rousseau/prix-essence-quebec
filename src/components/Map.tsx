@@ -10,6 +10,7 @@ const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_PUBLISHER_ID ?? ''
 
 interface ClusterLayerProps {
   stations: Station[]
+  selectedFuelType: 'regulier' | 'super' | 'diesel' | null
 }
 
 interface LeafletTooltipInternal extends L.Tooltip {
@@ -82,10 +83,14 @@ function esc(s: string): string {
   return s.replace(/[&<>"]/g, c => ESC_MAP[c])
 }
 
-function createStationCard(s: Station): string {
+function createStationCard(s: Station, selectedFuelType: 'regulier' | 'super' | 'diesel' | null): string {
   const displayName = esc(s.banniere || s.nom)
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`
   const badgeHtml = `<img src="${esc(getBrandLogo(s.banniere))}" class="brand-logo" alt="${displayName}" width="28" height="28">`
+  const selectedPrice = selectedFuelType === 'regulier' ? s.prixRegulier :
+                        selectedFuelType === 'super' ? s.prixSuper :
+                        selectedFuelType === 'diesel' ? s.prixDiesel :
+                        s.prixRegulier // default to regular if null
   const adSlotHtml = ADSENSE_CLIENT.trim()
     ? `<div class="station-card-ad-container">
          <div class="station-card-sep"></div>
@@ -104,7 +109,7 @@ function createStationCard(s: Station): string {
 
       <div class="station-card-compact">
         <div class="station-card-name">${badgeHtml}</div>
-        <div class="station-card-price">${fmt(s.prixRegulier)}</div>
+        <div class="station-card-price">${fmt(selectedPrice)}</div>
       </div>
       <div class="station-card-details">
         <div class="station-card-details-inner">
@@ -116,9 +121,9 @@ function createStationCard(s: Station): string {
             </div>
           </div>
           <div class="station-card-prices">
-            <div class="station-card-price-row"><span>Régulier</span><strong>${fmt(s.prixRegulier)}</strong></div>
-            <div class="station-card-price-row"><span>Super</span><strong>${fmt(s.prixSuper)}</strong></div>
-            <div class="station-card-price-row"><span>Diesel</span><strong>${fmt(s.prixDiesel)}</strong></div>
+            ${selectedFuelType === null || selectedFuelType === 'regulier' ? `<div class="station-card-price-row"><span>Régulier</span><strong>${fmt(s.prixRegulier)}</strong></div>` : ''}
+            ${selectedFuelType === null || selectedFuelType === 'super' ? `<div class="station-card-price-row"><span>Super</span><strong>${fmt(s.prixSuper)}</strong></div>` : ''}
+            ${selectedFuelType === null || selectedFuelType === 'diesel' ? `<div class="station-card-price-row"><span>Diesel</span><strong>${fmt(s.prixDiesel)}</strong></div>` : ''}
           </div>
           <a class="station-card-directions" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">
             Obtenir l'itinéraire
@@ -130,7 +135,7 @@ function createStationCard(s: Station): string {
   </div>`
 }
 
-function ClusterLayer({ stations }: ClusterLayerProps) {
+function ClusterLayer({ stations, selectedFuelType }: ClusterLayerProps) {
   const map = useMap()
   const tooltipElsRef = useRef(new Set<HTMLElement>())
 
@@ -293,7 +298,7 @@ function ClusterLayer({ stations }: ClusterLayerProps) {
         fillColor: getPriceColor(s.prixRegulier, lowThreshold, highThreshold, hasRange),
       })
 
-      marker.bindTooltip(() => createStationCard(s), TOOLTIP_OPTIONS)
+      marker.bindTooltip(() => createStationCard(s, selectedFuelType), TOOLTIP_OPTIONS)
 
       marker.on('tooltipopen', (e) => {
         scheduleSeparate()   // draw SVG connector as soon as tooltip is in the DOM
@@ -521,9 +526,10 @@ function MapController({ onMapReady }: { onMapReady: (map: L.Map) => void }) {
 interface MapProps {
   stations: Station[]
   onMapReady: (map: L.Map) => void
+  selectedFuelType: 'regulier' | 'super' | 'diesel' | null
 }
 
-export function Map({ stations, onMapReady }: MapProps) {
+export function Map({ stations, onMapReady, selectedFuelType }: MapProps) {
   return (
     <MapContainer
       center={[46.8139, -71.2082]}
@@ -538,7 +544,7 @@ export function Map({ stations, onMapReady }: MapProps) {
       />
       <ZoomControl position="topright" />
       <MapController onMapReady={onMapReady} />
-      <ClusterLayer stations={stations} />
+      <ClusterLayer stations={stations} selectedFuelType={selectedFuelType} />
       <LocateControl />
     </MapContainer>
   )
