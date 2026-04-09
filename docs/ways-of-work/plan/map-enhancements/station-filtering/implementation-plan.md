@@ -12,7 +12,7 @@ tags: feature, frontend, filtering, security, UI/UX, analytics, regional-filteri
 
 ![Status: In progress](https://img.shields.io/badge/status-In%20progress-yellow)
 
-This implementation plan outlines the addition of filtering functionality to the gas station map by fuel type and company, along with securing AdSense configuration by moving it to environment variables. The filter UI consists of a funnel icon button positioned to the right of the search bar, which opens an interactive filter panel with three fuel type badges and a brand dropdown with multi-select checkboxes. Additional features inspired by gazquebec.ca include regional filtering, price statistics/analytics, favorites functionality, and price trend indicators.
+This implementation plan outlines the addition of filtering functionality to the gas station map by fuel type and company, along with securing AdSense configuration by moving it to environment variables. The filter UI consists of an always-visible filter panel below the search bar with mutually exclusive fuel type selection (Tous/Régulier/Super/Diesel) and a brand dropdown with multi-select checkboxes. Additional features inspired by gazquebec.ca include regional filtering, price statistics/analytics, favorites functionality, and price trend indicators.
 
 ## Interactive Workflow Guide
 
@@ -49,12 +49,12 @@ This implementation plan outlines the addition of filtering functionality to the
 
 ## 1. Requirements & Constraints
 
-- **REQ-001**: Add filter controls for fuel types (Regular, Super, Diesel) as interactive badges below the search bar
+- **REQ-001**: Add filter controls for fuel types (Tous, Régulier, Super, Diesel) as mutually exclusive badges below the search bar
 - **REQ-002**: Add filter controls for service station companies via dropdown with multi-select checkboxes below the search bar
 - **REQ-003**: Implement real-time filtering of stations displayed on the map as filters are toggled
 - **REQ-004**: Move AdSense publisher ID and configuration to environment variables
-- **REQ-005**: Place filter activation button (funnel icon) to the right of the search bar within the same container
-- **REQ-006**: Display three fuel type badges (Regular, Super, Diesel) in a row below search bar when filter panel is open
+- **REQ-005**: Display filters always visible below the search bar (no toggle button needed)
+- **REQ-006**: Display four fuel type badges (Tous, Régulier, Super, Diesel) in a row below search bar with mutually exclusive selection
 - **REQ-007**: Display brand filter dropdown below fuel type badges with multi-select checkboxes, clear all, and select all options
 - **REQ-008**: Add regional filtering by Quebec administrative regions (Montreal, Montérégie, Laval, Laurentides, etc.)
 - **REQ-009**: Display price statistics showing cheapest stations for each fuel type
@@ -78,8 +78,8 @@ This implementation plan outlines the addition of filtering functionality to the
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
-| TASK-001 | Create FilterState interface in types/filter.ts with fuelTypes object (regulier, super, diesel booleans) and companies array | ✓ | 2026-04-08 |
-| TASK-002 | Add filter state to App.tsx with initial values: all fuel types true, all companies included | ✓ | 2026-04-08 |
+| TASK-001 | Create FilterState interface in types/filter.ts with selectedFuelType (regulier | super | diesel | null) and companies array | ✓ | 2026-04-08 |
+| TASK-002 | Add filter state to App.tsx with initial values: selectedFuelType null (all), all companies included | ✓ | 2026-04-08 |
 | TASK-003 | Implement filterStations function in App.tsx that takes stations array and filter state, returns filtered array based on fuel availability and brand | ✓ | 2026-04-08 |
 | TASK-004 | Update App.tsx to pass filtered stations to Map component instead of all stations | ✓ | 2026-04-08 |
 | TASK-005 | Add useEffect in App.tsx to re-filter when stations or filter state changes | ✓ | 2026-04-08 |
@@ -90,11 +90,14 @@ This implementation plan outlines the addition of filtering functionality to the
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
-| TASK-006 | Create FilterButton component in components/FilterButton.tsx: funnel icon button positioned to the right of SearchBar within TOP_CONTROLS_STYLE container, onClick toggles filterPanelOpen state | ✓ | 2026-04-08 |
-| TASK-007 | Create FilterPanel component in components/FilterPanel.tsx that conditionally renders below search bar, containing fuel type badges and brand dropdown | ✓ | 2026-04-08 |
-| TASK-008 | Implement FuelTypeBadges subcomponent: three clickable badges (Regular, Super, Diesel) with active/inactive visual states, onClick toggles filter state | ✓ | 2026-04-08 |
+| TASK-006 | Remove FilterButton component - filters are now always visible | ✓ | 2026-04-08 |
+| TASK-007 | Update FilterPanel component to always render below search bar, remove open prop | ✓ | 2026-04-08 |
+| TASK-008 | Update FuelTypeBadges subcomponent: four clickable badges (Tous, Régulier, Super, Diesel) with mutually exclusive selection | ✓ | 2026-04-08 |
 | TASK-009 | Implement BrandDropdown subcomponent: displays dropdown trigger, when opened shows checkboxes list of all unique banniere values, includes "Select all" and "Clear all" buttons in dropdown footer | ✓ | 2026-04-08 |
-| TASK-010 | Integrate FilterButton and FilterPanel into App.tsx, add filterPanelOpen state, pass onFilterChange callback to both components, ensure layout flows: SearchBar | FilterButton in top row, FilterPanel below | ✓ | 2026-04-08 |
+| TASK-010 | Integrate FilterPanel into App.tsx always visible below search bar, remove filterPanelOpen state | ✓ | 2026-04-08 |
+| TASK-011 | Update Map component to accept selectedFuelType prop and show only selected fuel prices in tooltips | ✓ | 2026-04-08 |
+| TASK-012 | Update useMapStats hook to calculate stats for selected fuel type | ✓ | 2026-04-08 |
+| TASK-013 | Update PriceStatsBar to use selected fuel type for statistics display | ✓ | 2026-04-08 |
 
 ### Implementation Phase 3: AdSense Configuration Security
 
@@ -170,24 +173,25 @@ This implementation plan outlines the addition of filtering functionality to the
 
 ## 2.1 Component Specifications
 
-### FilterButton Component
-- **Location**: src/components/FilterButton.tsx
-- **Props**: `onClick: () => void`, `isActive: boolean` (indicates if panel is open)
-- **Render**: Button element positioned absolute to right within search bar container
-- **Icon**: Funnel SVG icon (18x18), similar style to existing icons (stroke-width: 2.5, stroke-linecap: round)
-- **Styling**: 
+### FilterButton Component (REMOVED)
+- **Status**: Removed - filters are now always visible
+- **Previous Location**: src/components/FilterButton.tsx
+- **Previous Props**: `onClick: () => void`, `isActive: boolean` (indicates if panel is open)
+- **Previous Render**: Button element positioned absolute to right within search bar container
+- **Previous Icon**: Funnel SVG icon (18x18), similar style to existing icons (stroke-width: 2.5, stroke-linecap: round)
+- **Previous Styling**: 
   - Base: `absolute right-2.5 top-1/2 -translate-y-1/2`
   - Background: `bg-white/95 backdrop-blur-sm` when isActive true, `hover:bg-gray-50`
   - Border: `border border-gray-200`, `text-gray-700`
   - Rounded: `rounded-lg`
-- **Accessibility**: `aria-label="Filters"`, proper button semantics
+- **Previous Accessibility**: `aria-label="Filters"`, proper button semantics
 
 ### FilterPanel Component
 - **Location**: src/components/FilterPanel.tsx
-- **Props**: `open: boolean`, `filterState: FilterState`, `onFilterChange: (filterState: FilterState) => void`, `stations: Station[]`
-- **Render**: Conditional div that renders when `open === true`, positioned below search bar
+- **Props**: `filterState: FilterState`, `onFilterChange: (filterState: FilterState) => void`, `stations: Station[]`
+- **Render**: Always visible div rendered below search bar, containing fuel type badges and brand dropdown
 - **Layout**: Flex column with gap-3, padding consistent with SearchBar
-- **Children**: FuelTypeBadges, BrandDropdown, and RegionalFilter components
+- **Children**: FuelTypeBadges, BrandDropdown components
 - **Styling**:
   - Background: `bg-white/95 backdrop-blur-sm`
   - Border: `border border-gray-200`, `rounded-xl`
@@ -196,9 +200,10 @@ This implementation plan outlines the addition of filtering functionality to the
 
 ### FuelTypeBadges Component
 - **Location**: src/components/FuelTypeBadges.tsx
-- **Props**: `filterState: { regulier: boolean, super: boolean, diesel: boolean }`, `onToggle: (fuelType: 'regulier' | 'super' | 'diesel') => void`
-- **Render**: Three badge buttons in a row (gap-2)
-- **Badge Data**: `[{ label: 'Regular', key: 'regulier' }, { label: 'Super', key: 'super' }, { label: 'Diesel', key: 'diesel' }]`
+- **Props**: `selectedFuelType: 'regulier' | 'super' | 'diesel' | null`, `onSelect: (fuelType: 'regulier' | 'super' | 'diesel' | null) => void`
+- **Render**: Four badge buttons in a row (gap-2): "Tous", "Régulier", "Super", "Diesel"
+- **Badge Data**: `[{ label: 'Tous', key: null }, { label: 'Régulier', key: 'regulier' }, { label: 'Super', key: 'super' }, { label: 'Diesel', key: 'diesel' }]`
+- **Behavior**: Mutually exclusive selection - only one can be active at a time
 - **Badge Styling**:
   - Active: `bg-blue-500 text-white border border-blue-500`
   - Inactive: `bg-gray-100 text-gray-700 border border-gray-300`
@@ -256,11 +261,7 @@ This implementation plan outlines the addition of filtering functionality to the
 ### FilterState Type Definition
 ```typescript
 interface FilterState {
-  fuelTypes: {
-    regulier: boolean
-    super: boolean
-    diesel: boolean
-  }
+  selectedFuelType: 'regulier' | 'super' | 'diesel' | null
   companies: string[]
   regions: string[]
   showFavoritesOnly: boolean
@@ -369,7 +370,7 @@ Based on analysis of https://gazquebec.ca, the following features are recommende
 | Phase | Name | Status | Completed Tasks | Total Tasks | Last Updated |
 |-------|------|--------|-----------------|-------------|--------------|
 | Phase 1 | Core Filtering Logic | Completed | 5 | 5 | 2026-04-08 |
-| Phase 2 | Filter UI Components | Completed | 5 | 5 | 2026-04-08 |
+| Phase 2 | Filter UI Components | Completed | 8 | 8 | 2026-04-08 |
 | Phase 3 | AdSense Security | Completed | 5 | 5 | 2026-04-08 |
 | Phase 4 | Regional & Price Features | Not Started | 0 | 5 | - |
 | Phase 5 | Price Statistics Display | Not Started | 0 | 5 | - |
