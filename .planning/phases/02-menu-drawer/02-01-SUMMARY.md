@@ -97,11 +97,16 @@ During worktree branch base alignment, `git reset --soft` left staged deletions 
 
 None — no external service configuration required.
 
+## Verification
+
+- `npm run build` — pass (0 errors)
+- `npm run lint` — pass (0 errors, 2 pre-existing warnings in Map.tsx unrelated to this plan)
+- Human visual verification checkpoint — **approved** (all 5 checks passed: slide-in, slide-out via X, backdrop tap closes, no backdrop interference when closed, menu items open modals)
+
 ## Next Phase Readiness
 
-- Drawer slide animation is complete and build/lint both pass (0 errors)
-- Awaiting human verification (checkpoint:human-verify) to confirm visual animation works in browser
-- After checkpoint approval, drawer content/navigation polish can proceed in phase 02 follow-on plans
+- Drawer slide animation is complete, build/lint pass, human verification passed
+- Drawer content and navigation polish can proceed in phase 02 follow-on plans
 
 ---
 *Phase: 02-menu-drawer*
