@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
-import { X, Shield, HelpCircle, Cookie, Info } from 'lucide-react'
+import { X, Shield, HelpCircle, Cookie } from 'lucide-react'
 import { ADS_ENABLED } from '../lib/adConsent'
 
 interface HamburgerMenuProps {
@@ -59,15 +59,9 @@ export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookie
             onClick={() => { onClose(); setTimeout(onCookies, 300) }}
           />
         )}
-        <a
-          href="https://github.com/a-rousseau/prix-essence-quebec/issues/new/choose"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 px-4 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100"
-        >
-          <Info size={17} />
-          <span>Bugs et suggestions</span>
-        </a>
+        <div className="flex items-center gap-3 px-4 py-3.5 text-sm text-gray-700 transition-colors border-t border-gray-100">
+          <span>&copy;Daroost Design 2026</span>
+        </div>
       </div>
     </>
   )
