@@ -46,12 +46,12 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DROPDOWN-01 | Phase 1 | — |
-| DROPDOWN-02 | Phase 1 | — |
-| MENU-01 | Phase 2 | — |
-| MENU-02 | Phase 2 | — |
-| MENU-03 | Phase 2 | — |
-| FILTER-01 | Phase 3 | — |
-| FILTER-02 | Phase 3 | — |
-| ADS-01 | Phase 4 | — |
-| ADS-02 | Phase 4 | — |
+| DROPDOWN-01 | Phase 1 | Pending |
+| DROPDOWN-02 | Phase 1 | Pending |
+| MENU-01 | Phase 2 | Pending |
+| MENU-02 | Phase 2 | Pending |
+| MENU-03 | Phase 2 | Pending |
+| FILTER-01 | Phase 3 | Pending |
+| FILTER-02 | Phase 3 | Pending |
+| ADS-01 | Phase 4 | Pending |
+| ADS-02 | Phase 4 | Pending |
