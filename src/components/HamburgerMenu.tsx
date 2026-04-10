@@ -3,18 +3,26 @@ import { X, Shield, HelpCircle, Cookie, Info } from 'lucide-react'
 import { ADS_ENABLED } from '../lib/adConsent'
 
 interface HamburgerMenuProps {
+  open: boolean
   onClose: () => void
   onPrivacy: () => void
   onTrademarks: () => void
   onCookies: () => void
 }
 
-export function HamburgerMenu({ onClose, onPrivacy, onTrademarks, onCookies }: HamburgerMenuProps) {
+export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookies }: HamburgerMenuProps) {
   return (
     <>
-      <div className="fixed inset-0 z-[2900]" onClick={onClose} />
       <div
-        className="fixed top-0 left-0 right-0 z-[3000] bg-white border-b border-gray-200 shadow-lg"
+        className={`fixed inset-0 z-[2900] bg-black/50 transition-opacity duration-300 ease-in-out ${
+          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
+      <div
+        className={`fixed top-0 left-0 h-full z-[3000] w-72 max-w-[80vw] bg-white border-b border-gray-200 shadow-xl overflow-y-auto
+          transition-transform duration-300 ease-in-out
+          ${open ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px))' }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">

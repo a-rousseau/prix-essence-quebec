@@ -41,9 +41,7 @@ Plans:
   2. Tapping the close control slides the drawer back out with the same transition in reverse
   3. A dark semi-transparent backdrop covers the rest of the screen while the drawer is open
   4. Tapping the backdrop closes the drawer (same slide-out animation)
-**Plans**: 1 plan
-Plans:
-- [ ] 02-01-PLAN.md — Refactor HamburgerMenu to left-side slide drawer with animated backdrop; update App.tsx to always-mounted pattern
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 3: Filter Loading Feedback
@@ -76,6 +74,6 @@ Phases execute sequentially: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Dropdown Fixes | 0/1 | Not started | - |
-| 2. Menu Drawer | 0/1 | Not started | - |
+| 2. Menu Drawer | 0/? | Not started | - |
 | 3. Filter Loading Feedback | 0/? | Not started | - |
 | 4. AdSense Placement Strategy | 0/? | Not started | - |
