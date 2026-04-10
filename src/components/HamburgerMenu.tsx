@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useEffect, useRef } from 'react'
 import { X, Shield, HelpCircle, Cookie, Info } from 'lucide-react'
 import { ADS_ENABLED } from '../lib/adConsent'
 
@@ -11,6 +12,12 @@ interface HamburgerMenuProps {
 }
 
 export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookies }: HamburgerMenuProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (open) closeButtonRef.current?.focus()
+  }, [open])
+
   return (
     <>
       <div
@@ -20,6 +27,9 @@ export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookie
         onClick={onClose}
       />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu de navigation"
         className={`fixed top-0 left-0 h-full z-[3000] w-72 max-w-[80vw] bg-white border-b border-gray-200 shadow-xl overflow-y-auto
           transition-transform duration-300 ease-in-out
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
@@ -27,7 +37,7 @@ export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookie
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <span className="text-sm font-semibold text-gray-800"><img src="/brands/genericpump.svg" alt="Essence QC" className="w-6 h-6 mr-2" style={{ display: 'inline-block' }} />Essence QC</span>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Fermer">
+          <button ref={closeButtonRef} onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Fermer">
             <X size={18} />
           </button>
         </div>
