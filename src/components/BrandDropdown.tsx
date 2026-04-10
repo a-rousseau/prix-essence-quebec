@@ -55,7 +55,7 @@ export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange 
       </button>
 
       {open && (
-        <div className="absolute flex flex-col z-20 mt-2 right-0 w-50 rounded-md border border-gray-400 bg-white shadow-map overflow-hidden" style={{ maxHeight: 'calc(100dvh - 200px)' }}>
+        <div className="absolute flex flex-col z-20 mt-2 right-0 w-50 rounded-md border border-gray-400 bg-white shadow-map overflow-hidden" style={{ maxHeight: 'calc(100dvh - 240px)' }}>
           <div className="overflow-y-auto p-3 space-y-2">
             {availableBrands.length === 0 ? (
               <div className="text-sm text-gray-500">Aucune bannière disponible</div>
