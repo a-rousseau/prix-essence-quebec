@@ -35,18 +35,18 @@ export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookie
         <MenuItem
           label="Politique de confidentialité"
           icon={<Shield size={17} />}
-          onClick={() => { onClose(); onPrivacy() }}
+          onClick={() => { onClose(); setTimeout(onPrivacy, 300) }}
         />
         <MenuItem
           label="Marques & logos"
           icon={<HelpCircle size={17} />}
-          onClick={() => { onClose(); onTrademarks() }}
+          onClick={() => { onClose(); setTimeout(onTrademarks, 300) }}
         />
         {ADS_ENABLED && (
           <MenuItem
             label="Cookies"
             icon={<Cookie size={17} />}
-            onClick={() => { onClose(); onCookies() }}
+            onClick={() => { onClose(); setTimeout(onCookies, 300) }}
           />
         )}
         <a
