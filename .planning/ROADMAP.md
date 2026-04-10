@@ -43,7 +43,7 @@ Plans:
   4. Tapping the backdrop closes the drawer (same slide-out animation)
 **Plans**: 1 plan
 Plans:
-- [ ] 02-01-PLAN.md — Refactor HamburgerMenu to left-side slide drawer with animated backdrop; update App.tsx to always-mounted pattern
+- [x] 02-01-PLAN.md — Refactor HamburgerMenu to left-side slide drawer with animated backdrop; update App.tsx to always-mounted pattern
 **UI hint**: yes
 
 ### Phase 3: Filter Loading Feedback
