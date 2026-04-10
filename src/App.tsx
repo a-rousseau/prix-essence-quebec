@@ -109,14 +109,13 @@ export default function App() {
         <PriceStatsBar stations={filteredStations} lastUpdated={lastUpdated} map={mapInstance} onRefresh={refresh} selectedFuelType={filterState.selectedFuelType} />
       )}
 
-      {showMenu && (
-        <HamburgerMenu
-          onClose={() => setShowMenu(false)}
-          onPrivacy={() => setShowPrivacy(true)}
-          onTrademarks={() => setShowTrademark(true)}
-          onCookies={() => { clearAdConsent(); setShowBanner(true) }}
-        />
-      )}
+      <HamburgerMenu
+        open={showMenu}
+        onClose={() => setShowMenu(false)}
+        onPrivacy={() => setShowPrivacy(true)}
+        onTrademarks={() => setShowTrademark(true)}
+        onCookies={() => { clearAdConsent(); setShowBanner(true) }}
+      />
 
       {showPrivacy && <PrivacyNotice onClose={() => setShowPrivacy(false)} />}
       {showTrademark && <TrademarkNotice onClose={() => setShowTrademark(false)} />}
