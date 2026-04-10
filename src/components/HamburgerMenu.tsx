@@ -23,7 +23,7 @@ export function HamburgerMenu({ open, onClose, onPrivacy, onTrademarks, onCookie
         className={`fixed top-0 left-0 h-full z-[3000] w-72 max-w-[80vw] bg-white border-b border-gray-200 shadow-xl overflow-y-auto
           transition-transform duration-300 ease-in-out
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px))' }}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <span className="text-sm font-semibold text-gray-800"><img src="/brands/genericpump.svg" alt="Essence QC" className="w-6 h-6 mr-2" style={{ display: 'inline-block' }} />Essence QC</span>
