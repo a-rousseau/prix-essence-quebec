@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Menu } from 'lucide-react'
 import type L from 'leaflet'
 import { Map } from './components/Map'
@@ -41,7 +41,6 @@ export default function App() {
     showFavoritesOnly: false,
   })
   const [filteredStations, setFilteredStations] = useState(stations)
-  const brandsInitializedRef = useRef(false)
 
   const visibleError = error !== dismissedError ? error : null
 
@@ -50,10 +49,14 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (stations.length === 0 || brandsInitializedRef.current) return
+    if (stations.length === 0) return
     const availableCompanies = Array.from(new Set(stations.map(s => s.banniere).filter(Boolean))).sort()
-    brandsInitializedRef.current = true
-    setFilterState(prev => ({ ...prev, companies: availableCompanies }))
+    setFilterState(prev => {
+      // Add any newly discovered brands to the allowlist without resetting user selections
+      const newBrands = availableCompanies.filter(b => !prev.companies.includes(b))
+      if (newBrands.length === 0) return prev
+      return { ...prev, companies: [...prev.companies, ...newBrands] }
+    })
   }, [stations])
 
   useEffect(() => {
