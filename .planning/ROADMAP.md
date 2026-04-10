@@ -27,7 +27,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. User can click anywhere outside the open brand dropdown (map, stats bar, header) and it closes
   2. The open brand dropdown does not visually overlap the price stats bar on any mobile viewport
   3. Opening the dropdown on a small screen reveals filter options without obscuring the bottom bar
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 01-01-PLAN.md — Fix BrandDropdown: outside-click dismiss + height constraint to avoid PriceStatsBar overlap
 **UI hint**: yes
 
 ### Phase 2: Menu Drawer
@@ -71,7 +73,7 @@ Phases execute sequentially: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Dropdown Fixes | 0/? | Not started | - |
+| 1. Dropdown Fixes | 0/1 | Not started | - |
 | 2. Menu Drawer | 0/? | Not started | - |
 | 3. Filter Loading Feedback | 0/? | Not started | - |
 | 4. AdSense Placement Strategy | 0/? | Not started | - |
