@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 interface BrandDropdownProps {
@@ -9,6 +9,20 @@ interface BrandDropdownProps {
 
 export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange }: BrandDropdownProps) {
   const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleOutsideClick(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+    }
+  }, [open])
 
   const allSelected = selectedBrands.length === availableBrands.length && availableBrands.length > 0
   const label = allSelected ? 'Marques' : `Marques(${selectedBrands.length})`
@@ -30,7 +44,7 @@ export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange 
   }
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       <button
         type="button"
         onClick={() => setOpen(open => !open)}
@@ -41,7 +55,7 @@ export function BrandDropdown({ selectedBrands, availableBrands, onBrandsChange 
       </button>
 
       {open && (
-        <div className="absolute flex flex-col z-20 mt-2 right-0 w-50 rounded-md border border-gray-400 bg-white shadow-map overflow-hidden" style={{ height: `calc(100vh - 220px)` }}>
+        <div className="absolute flex flex-col z-20 mt-2 right-0 w-50 rounded-md border border-gray-400 bg-white shadow-map overflow-hidden" style={{ maxHeight: 'calc(100dvh - 200px)' }}>
           <div className="overflow-y-auto p-3 space-y-2">
             {availableBrands.length === 0 ? (
               <div className="text-sm text-gray-500">Aucune bannière disponible</div>
