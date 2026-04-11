@@ -46,16 +46,6 @@ Plans:
 - [x] 02-01-PLAN.md — Refactor HamburgerMenu to left-side slide drawer with animated backdrop; update App.tsx to always-mounted pattern
 **UI hint**: yes
 
-### Phase 02.1: Fix modal transitions for PrivacyNotice and TrademarkNotice (INSERTED)
-
-**Goal:** PrivacyNotice and TrademarkNotice slide in from the bottom and slide back out smoothly, matching the HamburgerMenu animation pattern
-**Requirements**: MODAL-01, MODAL-02, MODAL-03
-**Depends on:** Phase 2
-**Plans:** 1 plan
-
-Plans:
-- [ ] 02.1-01-PLAN.md — Fix PrivacyNotice and TrademarkNotice: always-mounted pattern, translate-y transitions, remove delay-150
-
 ### Phase 3: Filter Loading Feedback
 **Goal**: Users receive immediate visual confirmation that a filter change is being applied
 **Depends on**: Phase 2
@@ -87,6 +77,5 @@ Phases execute sequentially: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Dropdown Fixes | 0/1 | Not started | - |
 | 2. Menu Drawer | 0/1 | Not started | - |
-| 02.1. Modal Transitions Fix | 0/1 | Not started | - |
 | 3. Filter Loading Feedback | 0/? | Not started | - |
 | 4. AdSense Placement Strategy | 0/? | Not started | - |
