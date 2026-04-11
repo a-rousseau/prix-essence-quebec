@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-04-10T19:12:12.759Z"
-last_activity: 2026-04-10 -- Phase 01 plans complete, human-verified
+stopped_at: Phase 02.1 plans complete, human-verified
+last_updated: "2026-04-10T22:00:00.000Z"
+last_activity: 2026-04-10 -- Phase 02.1 plans complete, human-verified
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** The map shows you where to find the cheapest gas near you, right now.
-**Current focus:** Phase 01 — dropdown-fixes
+**Current focus:** Phase 02.1 — fix-modal-transitions-for-privacynotice-and-trademarknotice
 
 ## Current Position
 
-Phase: 01 (dropdown-fixes) — COMPLETE
+Phase: 02.1 (fix-modal-transitions-for-privacynotice-and-trademarknotice) — COMPLETE
 Plan: 1 of 1 ✓
 Status: All plans complete, human-verified. Ready for verification.
-Last activity: 2026-04-10 -- Phase 01 plans complete, human-verified
+Last activity: 2026-04-10 -- Phase 02.1 plans complete, human-verified
 
 Progress: [██░░░░░░░░] 25%
 
@@ -75,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T19:12:12.751Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-menu-drawer/02-UI-SPEC.md
+Last session: 2026-04-10T22:00:00.000Z
+Stopped at: Phase 02.1 plans complete, human-verified
+Resume file: .planning/phases/02.1-fix-modal-transitions-for-privacynotice-and-trademarknotice/02.1-01-SUMMARY.md
