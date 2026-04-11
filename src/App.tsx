@@ -120,8 +120,8 @@ export default function App() {
         onCookies={() => { clearAdConsent(); setShowBanner(true) }}
       />
 
-      {showPrivacy && <PrivacyNotice onClose={() => setShowPrivacy(false)} />}
-      {showTrademark && <TrademarkNotice onClose={() => setShowTrademark(false)} />}
+      <PrivacyNotice open={showPrivacy} onClose={() => setShowPrivacy(false)} />
+      <TrademarkNotice open={showTrademark} onClose={() => setShowTrademark(false)} />
       {showBanner && <ConsentBanner onConsent={handleConsent} />}
     </div>
   )
