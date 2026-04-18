@@ -66,14 +66,16 @@ Exceptions: none for this phase. The filter overlay occupies `inset-0` with no i
 ## Typography
 
 Phase 3 introduces no new text. The filter overlay carries no label (D-02: spinner only).
-Existing type scale is referenced here for completeness; do not introduce new sizes.
+Existing type scale is referenced here for sizes and weights actually used in this phase only.
+Display (24px / 900) is excluded — it is not used in Phase 3.
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 | 1.5 |
 | Label | 12px | 600 | 1 |
 | Heading | 16px | 600 | 1.3 |
-| Display | 24px | 900 | 1.2 |
+
+Distinct weights: 2 (400 regular, 600 semibold). Maximum weight ceiling is respected.
 
 Source: inferred from `src/index.css` station card classes and `src/components/LoadingSpinner.tsx`.
 No new type roles are introduced by this phase.
@@ -86,12 +88,13 @@ Project palette extracted from `src/index.css` and `src/components/`.
 
 | Role | Value | Usage |
 |------|-------|-------|
-| Dominant (60%) | `#ffffff` / `bg-white` | Map surface, cards, overlays backgrounds |
+| Dominant (60%) | `#ffffff` / `bg-white` | Map surface, cards, overlay backgrounds |
 | Secondary (30%) | `#f9fafb` / `bg-gray-50` | Station card price section, hover states |
-| Accent (10%) | `#1e3a5f` | Cluster icons, price text, directions button, station card price color |
+| Accent — navy (10%) | `#1e3a5f` | Cluster icon background, station card price values, directions link background |
+| Accent — blue | `#2563eb` | Locate control background only |
 | Destructive | `#dc2626` / `bg-red-50` | Error banner only |
 
-Accent reserved for: cluster icon background, station card price values, directions link background, locate control background (`#2563eb`). Never used for the filter overlay.
+Accent reserved for: cluster icons (`#1e3a5f`), station card price text (`#1e3a5f`), directions link (`#1e3a5f`), locate control (`#2563eb`). Neither accent is used on the filter overlay.
 
 ### Filter overlay color (new — this phase)
 
