@@ -43,7 +43,6 @@ export default function App() {
   })
   const [filteredStations, setFilteredStations] = useState(stations)
   const [filterPending, setFilterPending] = useState(false)
-  const overlayStartRef = useRef<number>(0)
   const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const visibleError = error !== dismissedError ? error : null
@@ -69,10 +68,9 @@ export default function App() {
     // LoadingSpinner handles the initial load state; filteredStations stays [] naturally.
     if (stations.length === 0) return
 
-    // Show overlay and record start time (D-03, D-04)
+    // Show overlay (D-03, D-04)
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilterPending(true)
-    overlayStartRef.current = Date.now()
 
     // Cancel any pending hide timer to handle rapid filter changes
     if (overlayTimerRef.current !== null) {
@@ -85,17 +83,16 @@ export default function App() {
     setFilteredStations(result)
 
     // Enforce 500ms minimum before hiding overlay (D-03)
-    const elapsed = Date.now() - overlayStartRef.current
-    const remaining = Math.max(0, 500 - elapsed)
     overlayTimerRef.current = setTimeout(() => {
       setFilterPending(false)
       overlayTimerRef.current = null
-    }, remaining)
+    }, 500)
 
     // Cleanup: cancel pending timer on unmount or next effect run
     return () => {
       if (overlayTimerRef.current !== null) {
         clearTimeout(overlayTimerRef.current)
+        overlayTimerRef.current = null
       }
     }
   }, [stations, filterState])
