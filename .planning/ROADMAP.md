@@ -68,7 +68,9 @@ Plans:
   2. The document specifies a maximum ads-per-view density rule
   3. The document identifies which slot IDs map to which zones
   4. The document explicitly states that no ad zone blocks the map, price stats bar, or filter controls on mobile
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 04-01-PLAN.md — Write .planning/ADS-STRATEGY.md: zone table, density policy, consent gating, activation checklist
 
 ## Progress
 
@@ -80,4 +82,4 @@ Phases execute sequentially: 1 → 2 → 3 → 4
 | 1. Dropdown Fixes | 0/1 | Not started | - |
 | 2. Menu Drawer | 0/1 | Not started | - |
 | 3. Filter Loading Feedback | 0/1 | Not started | - |
-| 4. AdSense Placement Strategy | 0/? | Not started | - |
+| 4. AdSense Placement Strategy | 0/1 | Not started | - |
