@@ -1,11 +1,10 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Menu } from 'lucide-react'
 import type L from 'leaflet'
 import { Map } from './components/Map'
 import { PriceStatsBar } from './components/PriceStatsBar'
 import { SearchBar } from './components/SearchBar'
 import { LoadingSpinner } from './components/LoadingSpinner'
-import { FilterOverlay } from './components/FilterOverlay'
 import { ConsentBanner } from './components/ConsentBanner'
 import { TrademarkNotice } from './components/TrademarkNotice'
 import { PrivacyNotice } from './components/PrivacyNotice'
@@ -15,8 +14,6 @@ import { getAdConsent, loadAdSense, ADS_ENABLED, clearAdConsent } from './lib/ad
 import { useStations } from './hooks/useStations'
 import { filterStations } from './lib/filterUtils'
 import type { FilterState } from './types/filter'
-
-const FILTER_OVERLAY_MIN_MS = 500 // ms — minimum overlay duration for perceived stability (D-03)
 
 const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
 const TOP_CONTROLS_STYLE = {
@@ -43,9 +40,7 @@ export default function App() {
     regions: [],
     showFavoritesOnly: false,
   })
-  const [filteredStations, setFilteredStations] = useState<typeof stations>([])
-  const [filterPending, setFilterPending] = useState(false)
-  const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [filteredStations, setFilteredStations] = useState(stations)
 
   const visibleError = error !== dismissedError ? error : null
 
@@ -56,7 +51,6 @@ export default function App() {
   useEffect(() => {
     if (stations.length === 0) return
     const availableCompanies = Array.from(new Set(stations.map(s => s.banniere).filter(Boolean))).sort()
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilterState(prev => {
       // Add any newly discovered brands to the allowlist without resetting user selections
       const newBrands = availableCompanies.filter(b => !prev.companies.includes(b))
@@ -66,37 +60,7 @@ export default function App() {
   }, [stations])
 
   useEffect(() => {
-    // Guard: don't show filter overlay before stations data arrives.
-    // LoadingSpinner handles the initial load state; filteredStations stays [] naturally.
-    if (stations.length === 0) return
-
-    // Show overlay (D-03, D-04)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFilterPending(true)
-
-    // Cancel any pending hide timer to handle rapid filter changes
-    if (overlayTimerRef.current !== null) {
-      clearTimeout(overlayTimerRef.current)
-      overlayTimerRef.current = null
-    }
-
-    // Apply filter synchronously
-    const result = filterStations(stations, filterState)
-    setFilteredStations(result)
-
-    // Enforce 500ms minimum before hiding overlay (D-03)
-    overlayTimerRef.current = setTimeout(() => {
-      setFilterPending(false)
-      overlayTimerRef.current = null
-    }, FILTER_OVERLAY_MIN_MS)
-
-    // Cleanup: cancel pending timer on unmount or next effect run
-    return () => {
-      if (overlayTimerRef.current !== null) {
-        clearTimeout(overlayTimerRef.current)
-        overlayTimerRef.current = null
-      }
-    }
+    setFilteredStations(filterStations(stations, filterState))
   }, [stations, filterState])
 
   function handleConsent(accepted: boolean) {
@@ -108,7 +72,6 @@ export default function App() {
     <div className="h-dvh w-screen flex flex-col overflow-hidden">
       <div className="relative flex-1 min-h-0">
         {loading && <LoadingSpinner />}
-        <FilterOverlay visible={filterPending && !loading} />
 
         {visibleError && (
           <div className="absolute left-4 right-4 z-[2000] bg-red-50 border border-red-200 rounded-md px-4 py-3 text-sm text-red-700 shadow-md flex items-start gap-3" style={ERROR_STYLE}>
