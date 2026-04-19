@@ -54,7 +54,9 @@ Plans:
   1. Changing fuel type or brand selection triggers a full-screen dark overlay with a centered spinner
   2. The overlay disappears once the filtered station set is rendered on the map
   3. The overlay never gets stuck — it always clears after a filter operation completes
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 03-01-PLAN.md — Create FilterOverlay component and wire filterPending lifecycle into App.tsx
 **UI hint**: yes
 
 ### Phase 4: AdSense Placement Strategy
@@ -77,5 +79,5 @@ Phases execute sequentially: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Dropdown Fixes | 0/1 | Not started | - |
 | 2. Menu Drawer | 0/1 | Not started | - |
-| 3. Filter Loading Feedback | 0/? | Not started | - |
+| 3. Filter Loading Feedback | 0/1 | Not started | - |
 | 4. AdSense Placement Strategy | 0/? | Not started | - |
