@@ -70,7 +70,7 @@ Plans:
   4. The document explicitly states that no ad zone blocks the map, price stats bar, or filter controls on mobile
 **Plans**: 1 plan
 Plans:
-- [ ] 04-01-PLAN.md — Write .planning/ADS-STRATEGY.md: zone table, density policy, consent gating, activation checklist
+- [x] 04-01-PLAN.md — Write .planning/ADS-STRATEGY.md: zone table, density policy, consent gating, activation checklist
 
 ## Progress
 
