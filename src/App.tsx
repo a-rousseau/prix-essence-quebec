@@ -84,9 +84,9 @@ export default function App() {
     const result = filterStations(stations, filterState)
     setFilteredStations(result)
 
-    // Enforce 150ms minimum before hiding overlay (D-03)
+    // Enforce 500ms minimum before hiding overlay (D-03)
     const elapsed = Date.now() - overlayStartRef.current
-    const remaining = Math.max(0, 150 - elapsed)
+    const remaining = Math.max(0, 500 - elapsed)
     overlayTimerRef.current = setTimeout(() => {
       setFilterPending(false)
       overlayTimerRef.current = null
