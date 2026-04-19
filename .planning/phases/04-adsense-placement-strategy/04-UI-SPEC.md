@@ -45,7 +45,7 @@ Declared values (must be multiples of 4):
 | 3xl | 64px | Page-level spacing |
 
 Exceptions:
-- Station card compact padding is 5px vertical / 8px horizontal (existing code — do not change).
+- The `.station-card-compact` compact padding is a pre-existing CSS rule outside the spacing token system — it is not a declared spacing token and must not be referenced or replicated by Phase 5 implementers.
 - Ad container separator (`station-card-sep`) is 1px height with 8px bottom margin (existing code — do not change).
 - Touch target minimum for any future ad close/dismiss control: 44px (mobile accessibility floor).
 
@@ -57,12 +57,14 @@ Source: `src/index.css` `.station-card-compact`, `.station-card-sep` rules.
 
 Existing type scale extracted from `src/index.css` — no new sizes may be introduced in Phase 4 or 5 ad slots without a contract amendment.
 
+Declared weights: 400 (regular) and 700 (bold). No other weights may be introduced.
+
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body / detail | 14px | 400 | 1.3 |
-| Label / compact card | 11px | 600 | 1 (single line) |
+| Label / compact card | 11px | 700 | 1 (single line) |
 | Price (compact) | 14px | 700 | 1 |
-| Price (expanded) | 24px | 900 | 1 |
+| Price (expanded) | 24px | 700 | 1 |
 | Cluster count | 12px | 700 | 1 |
 
 Ad slot constraint: The `<ins class="adsbygoogle">` block inside `.station-card-ad-container` renders
