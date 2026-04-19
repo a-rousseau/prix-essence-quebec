@@ -16,6 +16,8 @@ import { useStations } from './hooks/useStations'
 import { filterStations } from './lib/filterUtils'
 import type { FilterState } from './types/filter'
 
+const FILTER_OVERLAY_MIN_MS = 500 // ms — minimum overlay duration for perceived stability (D-03)
+
 const ERROR_STYLE = { top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }
 const TOP_CONTROLS_STYLE = {
   top: 'max(12px, env(safe-area-inset-top, 12px))',
@@ -41,7 +43,7 @@ export default function App() {
     regions: [],
     showFavoritesOnly: false,
   })
-  const [filteredStations, setFilteredStations] = useState(stations)
+  const [filteredStations, setFilteredStations] = useState<typeof stations>([])
   const [filterPending, setFilterPending] = useState(false)
   const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -86,7 +88,7 @@ export default function App() {
     overlayTimerRef.current = setTimeout(() => {
       setFilterPending(false)
       overlayTimerRef.current = null
-    }, 500)
+    }, FILTER_OVERLAY_MIN_MS)
 
     // Cleanup: cancel pending timer on unmount or next effect run
     return () => {
