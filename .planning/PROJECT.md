@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A mobile-first Progressive Web App that displays real-time gas prices across Quebec, pulling data from the Régie de l'énergie du Québec. Users can browse an interactive map of gas stations, filter by fuel type and brand, and find the cheapest nearby prices. The app is entirely public — no accounts, no login.
+A mobile-first Progressive Web App that displays real-time gas prices across Quebec, pulling data from the Régie de l'énergie du Québec. Users can browse an interactive map of gas stations, filter by fuel type and brand, and find the cheapest nearby prices. The app is entirely public — no accounts, no login. UI interactions are polished: animated side drawer, filter overlay feedback, and consent-ready ad infrastructure.
 
 ## Core Value
 
@@ -22,15 +22,22 @@ The map shows you where to find the cheapest gas near you, right now.
 - ✓ Ad consent banner (Loi 25 / GDPR compliant) — existing
 - ✓ PWA with offline tile caching and GeoJSON NetworkFirst caching — existing
 - ✓ Mobile-first responsive layout — existing
+- ✓ Brand dropdown closes when user clicks outside it — v1.0
+- ✓ Brand dropdown does not overlap the price stats bar on mobile — v1.0
+- ✓ Hamburger menu slides in from the left (non-full-width drawer, ease-in-out transition) — v1.0
+- ✓ Hamburger menu slides back out on close with the same transition — v1.0
+- ✓ Dark backdrop covers the map while drawer is open; tapping it closes the drawer — v1.0
+- ✓ A dark overlay + spinner appears on screen when a filter change is applied — v1.0
+- ✓ Overlay disappears once filtered results are rendered to the map — v1.0
+- ✓ PrivacyNotice and TrademarkNotice open/close with smooth bottom-sheet slide animation — v1.0
+- ✓ AdSense placement strategy documented (zone table, density policy, consent gating) — v1.0
 
 ### Active
 
-- [ ] Brand dropdown closes when user clicks outside it
-- [ ] Brand dropdown does not overlap the price stats bar on mobile
-- [ ] Hamburger menu slides in from the left (non-full-width drawer, ease-in-out transition)
-- [ ] Hamburger menu slides back out on close with the same transition
-- [ ] A dark overlay + spinner appears on screen when a filter change is applied (fuel type or brand)
-- [ ] AdSense placement strategy documented — where ads appear, density rules, consent gating approach
+- [ ] Implement AdSense ad units in code (slot 3373913657 — strategy is in `.planning/ADS-STRATEGY.md`)
+- [ ] Keyboard accessibility for map markers
+- [ ] `aria-pressed` on fuel type toggles
+- [ ] `fieldset`/`legend` wrapper on brand checkbox list
 
 ### Out of Scope
 
@@ -38,15 +45,18 @@ The map shows you where to find the cheapest gas near you, right now.
 - Server-side rendering — SPA architecture is established
 - Price history or trend charts — data source is current-state only
 - Native mobile app (iOS/Android) — PWA covers the mobile use case
+- AdSense code implementation in v1.0 — placement strategy ships first, ad units in next milestone
 
 ## Context
 
 - Stack: React 19 + TypeScript, Vite, Tailwind CSS v4, Leaflet + react-leaflet, leaflet.markercluster, vite-plugin-pwa
 - Deployed on Netlify; one serverless function (`stations.mts`) exists but is currently unused (frontend fetches GeoJSON directly)
 - All UI copy is in French (fr-CA)
-- AdSense is wired up but gated behind Loi 25 consent; publisher ID is in `index.html`, slot ID is hard-coded in `Map.tsx`
+- AdSense: publisher ID in `index.html`, slot 3373913657 wired in `Map.tsx`, gated by `ADS_ENABLED` via `adConsent.ts`; `ADS-STRATEGY.md` documents activation checklist
+- Shipped v1.0 with ~1,943 TypeScript LOC, 123 commits over 17 days
+- Always-mounted CSS toggle pattern (translate/opacity) now established for all drawers/modals — reuse for future UI work
+- Known tech debt: `FilterButton.tsx` dead code, unused `regions`/`showFavoritesOnly` filter fields, `ajv` unused dep, O(n²) tooltip collision loop, zero automated tests, `Map.tsx` react-hooks/exhaustive-deps warning (pre-existing)
 - Codebase map: `.planning/codebase/` (generated 2026-04-10)
-- Known issues per codebase map: dead code (`FilterButton.tsx`, unused `regions`/`showFavoritesOnly` fields, `ajv` dep), O(n²) tooltip collision loop, zero automated tests
 
 ## Constraints
 
@@ -62,7 +72,12 @@ The map shows you where to find the cheapest gas near you, right now.
 | Fetch GeoJSON directly from regieessencequebec.ca | Simpler, no server cost, browser handles gzip decompression | ✓ Good |
 | All state in App.tsx, no state library | App is simple enough; avoids Redux/Zustand overhead | ✓ Good |
 | Tailwind v4 (no config file) | Zero-config, matches Vite plugin approach | ✓ Good |
-| Spinner on every filter change (not just fetches) | User wants visual feedback even for instant JS filtering | — Pending |
+| Spinner on every filter change (not just fetches) | User wants visual feedback even for instant JS filtering | ✓ Good — shipped in Phase 03 |
+| Always-mounted CSS toggle pattern for all drawers/modals | Exit animations require DOM presence; conditional unmount kills the transition | ✓ Good — applied to HamburgerMenu, PrivacyNotice, TrademarkNotice, FilterOverlay |
+| 500ms flat minimum for FilterOverlay (vs 150ms elapsed-time logic) | 150ms felt too quick on device; flat constant is simpler and more predictable | ✓ Good — user-approved |
+| maxHeight: calc(100dvh - 240px) for BrandDropdown (vs 200px plan) | 200px was insufficient clearance on test device; 240px gives visible space | ✓ Good — human-verified |
+| Separate transition-transform (drawer) vs transition-opacity (backdrop) | Avoids composite animation conflicts; each property animates independently | ✓ Good |
+| AdSense strategy-first, implementation deferred | Ensures placement decisions are documented before code is written; consent gating already in place | ✓ Good |
 
 ## Evolution
 
@@ -82,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after initialization*
+*Last updated: 2026-04-20 after v1.0 milestone*
