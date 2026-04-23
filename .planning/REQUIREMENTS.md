@@ -50,25 +50,25 @@
 
 | REQ-ID | Phase | Plan | Status |
 |--------|-------|------|--------|
-| FAV-01 | TBD | TBD | — |
-| FAV-02 | TBD | TBD | — |
-| FAV-03 | TBD | TBD | — |
-| FAV-04 | TBD | TBD | — |
-| FAV-05 | TBD | TBD | — |
-| FAV-06 | TBD | TBD | — |
-| FAV-07 | TBD | TBD | — |
-| GEO-01 | TBD | TBD | — |
-| GEO-02 | TBD | TBD | — |
-| GEO-03 | TBD | TBD | — |
-| GEO-04 | TBD | TBD | — |
-| ADS-01 | TBD | TBD | — |
-| ADS-02 | TBD | TBD | — |
-| ADS-03 | TBD | TBD | — |
-| ADS-04 | TBD | TBD | — |
-| A11Y-01 | TBD | TBD | — |
-| A11Y-02 | TBD | TBD | — |
-| A11Y-03 | TBD | TBD | — |
-| A11Y-04 | TBD | TBD | — |
+| A11Y-01 | Phase 05 | TBD | Pending |
+| A11Y-02 | Phase 05 | TBD | Pending |
+| A11Y-03 | Phase 05 | TBD | Pending |
+| A11Y-04 | Phase 05 | TBD | Pending |
+| GEO-01 | Phase 06 | TBD | Pending |
+| GEO-02 | Phase 06 | TBD | Pending |
+| GEO-03 | Phase 06 | TBD | Pending |
+| GEO-04 | Phase 06 | TBD | Pending |
+| ADS-01 | Phase 07 | TBD | Pending |
+| ADS-02 | Phase 07 | TBD | Pending |
+| ADS-03 | Phase 07 | TBD | Pending |
+| ADS-04 | Phase 07 | TBD | Pending |
+| FAV-01 | Phase 08 | TBD | Pending |
+| FAV-02 | Phase 08 | TBD | Pending |
+| FAV-03 | Phase 08 | TBD | Pending |
+| FAV-04 | Phase 08 | TBD | Pending |
+| FAV-05 | Phase 08 | TBD | Pending |
+| FAV-06 | Phase 08 | TBD | Pending |
+| FAV-07 | Phase 08 | TBD | Pending |
 
 ---
-*Last updated: 2026-04-22 — milestone v1.1 requirements defined*
+*Last updated: 2026-04-22 — roadmap created, phase assignments complete*
