@@ -8,6 +8,16 @@ A mobile-first Progressive Web App that displays real-time gas prices across Que
 
 The map shows you where to find the cheapest gas near you, right now.
 
+## Current Milestone: v1.1 Favorites, Geolocation & Revenue
+
+**Goal:** Ship user-facing station favorites and improved geolocation, activate AdSense revenue, and close v1.0 accessibility gaps.
+
+**Target features:**
+- Favorites — save/unsave stations to localStorage, visible on map
+- Better geolocation — auto-center on load, accuracy ring, clear errors
+- AdSense implementation — activate slot 3373913657, consent-gated
+- Accessibility — aria-pressed on fuel toggles, fieldset/legend on brand list, keyboard nav for map markers
+
 ## Requirements
 
 ### Validated
@@ -32,8 +42,10 @@ The map shows you where to find the cheapest gas near you, right now.
 - ✓ PrivacyNotice and TrademarkNotice open/close with smooth bottom-sheet slide animation — v1.0
 - ✓ AdSense placement strategy documented (zone table, density policy, consent gating) — v1.0
 
-### Active
+### Active (v1.1)
 
+- [ ] Favorites — save/unsave stations to localStorage, visible on map
+- [ ] Better geolocation — auto-center on load, accuracy ring, clear errors
 - [ ] Implement AdSense ad units in code (slot 3373913657 — strategy is in `.planning/ADS-STRATEGY.md`)
 - [ ] Keyboard accessibility for map markers
 - [ ] `aria-pressed` on fuel type toggles
@@ -97,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 after v1.0 milestone*
+*Last updated: 2026-04-22 — milestone v1.1 started*
